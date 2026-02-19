@@ -1,41 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar as CalendarIcon, CheckCircle, XCircle, Search, UserCheck, UserX } from 'lucide-react';
-
-const DUMMY_ATTENDANCE = [
-    { id: 1, name: 'John Doe', status: 'present', time: '07:30 AM' },
-    { id: 2, name: 'Jane Smith', status: 'absent', time: '-' },
-    { id: 3, name: 'Mike Ross', status: 'present', time: '06:45 AM' },
-    { id: 4, name: 'Sarah Connor', status: 'present', time: '08:15 AM' },
-    { id: 5, name: 'Tony Stark', status: 'absent', time: '-' },
-];
 
 const Attendance = () => {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [attendanceData, setAttendanceData] = useState(DUMMY_ATTENDANCE);
+    const [attendanceData, setAttendanceData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const toggleStatus = (id) => {
-        setAttendanceData(prev => prev.map(record => {
-            if (record.id === id) {
-                return {
-                    ...record,
-                    status: record.status === 'present' ? 'absent' : 'present',
-                    time: record.status === 'present' ? '-' : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                };
+    // Fetch Attendance on Date Change
+    useEffect(() => {
+        const fetchAttendance = async () => {
+            setLoading(true);
+            try {
+                const res = await fetch(`/api/attendance?date=${date}&v=${Date.now()}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setAttendanceData(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch attendance:", err);
+            } finally {
+                setLoading(false);
             }
-            return record;
-        }));
+        };
+        fetchAttendance();
+    }, [date]);
+
+    // Toggle Attendance Status
+    const toggleStatus = async (id, currentStatus) => {
+        const newStatus = currentStatus === 'present' ? 'absent' : 'present';
+
+        // Optimistic Update
+        setAttendanceData(prev => prev.map(record =>
+            record.member_id === id ? { ...record, status: newStatus } : record
+        ));
+
+        try {
+            await fetch('/api/attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ member_id: id, status: newStatus, date })
+            });
+        } catch (err) {
+            console.error("Failed to update status", err);
+            // Revert on failure
+            setAttendanceData(prev => prev.map(record =>
+                record.member_id === id ? { ...record, status: currentStatus } : record
+            ));
+        }
     };
 
     const filteredAttendance = attendanceData.filter(record =>
-        record.name.toLowerCase().includes(searchTerm.toLowerCase())
+        record.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Calculate stats
     const presentCount = attendanceData.filter(r => r.status === 'present').length;
     const totalCount = attendanceData.length;
-    const percentage = Math.round((presentCount / totalCount) * 100) || 0;
+    const percentage = totalCount > 0 ? Math.round((presentCount / totalCount) * 100) : 0;
 
     return (
         <motion.div
@@ -92,47 +115,49 @@ const Attendance = () => {
             </div>
 
             {/* List */}
-            <div className="space-y-3">
-                {filteredAttendance.map(record => (
-                    <motion.div
-                        key={record.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`p-4 rounded-2xl flex justify-between items-center border transition-all ${record.status === 'present'
+            {loading ? (
+                <div className="text-center py-10 text-gray-500">Loading attendance...</div>
+            ) : (
+                <div className="space-y-3">
+                    {filteredAttendance.map(record => (
+                        <motion.div
+                            key={record.member_id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`p-4 rounded-2xl flex justify-between items-center border transition-all ${record.status === 'present'
                                 ? 'bg-blue-50/50 border-blue-100 shadow-sm'
                                 : 'bg-white/60 border-gray-100'
-                            }`}
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${record.status === 'present' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'
-                                }`}>
-                                {record.name.charAt(0)}
-                            </div>
-                            <div>
-                                <h3 className={`font-semibold text-base ${record.status === 'present' ? 'text-gray-900' : 'text-gray-500'}`}>{record.name}</h3>
-                                <p className="text-xs text-gray-400 font-medium">Check-in: {record.time}</p>
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={() => toggleStatus(record.id)}
-                            className={`p-2 rounded-xl transition-all shadow-sm ${record.status === 'present'
-                                    ? 'bg-green-100 text-green-600 hover:bg-green-200'
-                                    : 'bg-red-50 text-red-400 hover:bg-red-100'
                                 }`}
                         >
-                            {record.status === 'present' ? <UserCheck size={20} /> : <UserX size={20} />}
-                        </button>
-                    </motion.div>
-                ))}
+                            <div className="flex items-center gap-3">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${record.status === 'present' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'}`}>
+                                    {record.name?.charAt(0)}
+                                </div>
+                                <div>
+                                    <h3 className={`font-semibold text-base ${record.status === 'present' ? 'text-gray-900' : 'text-gray-500'}`}>{record.name}</h3>
+                                    <p className="text-[10px] text-gray-400 font-medium">ID: {record.member_id}</p>
+                                </div>
+                            </div>
 
-                {filteredAttendance.length === 0 && (
-                    <div className="text-center py-10 opacity-50">
-                        <p className="text-gray-500">No members found</p>
-                    </div>
-                )}
-            </div>
+                            <button
+                                onClick={() => toggleStatus(record.member_id, record.status)}
+                                className={`p-2 rounded-xl transition-all shadow-sm ${record.status === 'present'
+                                    ? 'bg-green-100 text-green-600 hover:bg-green-200'
+                                    : 'bg-red-50 text-red-400 hover:bg-red-100'
+                                    }`}
+                            >
+                                {record.status === 'present' ? <UserCheck size={20} /> : <UserX size={20} />}
+                            </button>
+                        </motion.div>
+                    ))}
+
+                    {filteredAttendance.length === 0 && (
+                        <div className="text-center py-10 opacity-50">
+                            <p className="text-gray-500">No active members found</p>
+                        </div>
+                    )}
+                </div>
+            )}
         </motion.div>
     );
 };

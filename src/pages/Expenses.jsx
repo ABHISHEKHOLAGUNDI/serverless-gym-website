@@ -29,7 +29,12 @@ const Expenses = () => {
         return true;
     });
 
-    const totalAmount = filteredTransactions.reduce((acc, curr) => acc + curr.amount, 0);
+    const totalAmount = filteredTransactions.reduce((acc, curr) => {
+        if (activeTab === 'All') {
+            return curr.type === 'Income' ? acc + curr.amount : acc - curr.amount;
+        }
+        return acc + curr.amount;
+    }, 0);
 
     const handleTabChange = (tab) => {
         const newFilter = tab.toLowerCase();

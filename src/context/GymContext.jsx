@@ -136,15 +136,22 @@ export const GymProvider = ({ children }) => {
     };
 
     const updateMember = async (updatedMember) => {
+        const originalMembers = [...members];
         setMembers(prev => prev.map(m => m.id === updatedMember.id ? updatedMember : m));
         try {
-            await fetch('/api/members', {
+            const res = await fetch('/api/members', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedMember)
             });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || "Update failed");
+            }
         } catch (err) {
             console.error("Update member failed", err);
+            setMembers(originalMembers); // Revert
+            alert("Failed to update member: " + err.message);
         }
     };
 
