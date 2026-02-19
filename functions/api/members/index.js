@@ -43,7 +43,17 @@ export async function onRequestPut(context) {
     const { request, env } = context;
     try {
         const data = await request.json();
-        const { id, name, phone, photo, planType, amount, startDate, expiry, dob, status } = data;
+        // Default to null if undefined, so bind() calls receive null instead of undefined
+        const id = data.id;
+        const name = data.name || null;
+        const phone = data.phone || null;
+        const photo = data.photo || null;
+        const planType = data.planType || null;
+        const amount = data.amount || null;
+        const startDate = data.startDate || null;
+        const expiry = data.expiry || null;
+        const dob = data.dob || null;
+        const status = data.status || null;
 
         await env.DB.prepare(
             `UPDATE members SET 
