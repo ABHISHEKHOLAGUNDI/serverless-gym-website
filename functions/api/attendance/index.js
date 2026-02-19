@@ -5,7 +5,7 @@ export async function onRequestGet(context) {
 
     try {
         const { results } = await env.DB.prepare(
-            `SELECT a.member_id, a.status, a.date, m.name, m.photo 
+            `SELECT m.id as member_id, a.status, a.date, m.name, m.photo 
              FROM members m 
              LEFT JOIN attendance a ON m.id = a.member_id AND a.date = ? 
              WHERE m.status = 'active'`

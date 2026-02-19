@@ -174,13 +174,15 @@ const Reports = () => {
                             {/* Physical Stats Grid */}
                             <div className="grid grid-cols-2 gap-4">
                                 {/* BMI Card */}
-                                <div className={`p-4 rounded-2xl border ${bmiData.status === 'Normal' ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
+                                <div className={`p-4 rounded-2xl border ${bmiData.status === 'Normal' ? 'bg-green-50 border-green-100' : bmiData.status === 'Unknown' ? 'bg-gray-50 border-gray-100' : 'bg-red-50 border-red-100'}`}>
                                     <p className="text-xs font-bold text-gray-500 uppercase">BMI Score</p>
                                     <div className="flex items-end gap-2 mt-1">
                                         <span className={`text-2xl font-black ${bmiData.color}`}>{bmiData.value}</span>
                                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full bg-white/50 ${bmiData.color}`}>{bmiData.status}</span>
                                     </div>
-                                    <p className="text-[10px] text-gray-400 mt-1">Based on default height (missing in DB)</p>
+                                    <p className="text-[10px] text-gray-400 mt-1">
+                                        {bmiData.status === 'Unknown' ? "Update member height to see BMI" : "Based on weight & height"}
+                                    </p>
                                 </div>
 
                                 {/* Weight Progress Card */}
