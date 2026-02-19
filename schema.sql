@@ -54,7 +54,11 @@ CREATE TABLE measurements (
   member_id INTEGER NOT NULL,
   date DATE DEFAULT (DATE('now')),
   weight REAL,
-  body_fat REAL,
-  muscle_mass REAL,
+  chest REAL,
+  biceps_l REAL, -- Left Bicep
+  biceps_r REAL, -- Right Bicep
+  waist REAL,
+  thigh REAL,
+  calves REAL,
   FOREIGN KEY (member_id) REFERENCES members(id)
 );

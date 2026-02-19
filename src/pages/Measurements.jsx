@@ -9,6 +9,20 @@ const Measurements = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
 
+    // Fetch measurements when member is selected
+    React.useEffect(() => {
+        if (selectedMember) {
+            fetch(`/api/measurements?member_id=${selectedMember.id}&v=${Date.now()}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        setSelectedMember(prev => ({ ...prev, measurements: data }));
+                    }
+                })
+                .catch(err => console.error("Failed to fetch measurements", err));
+        }
+    }, [selectedMember?.id]);
+
     const [newEntry, setNewEntry] = useState({
         date: new Date().toISOString().split('T')[0],
         weight: '',
@@ -20,21 +34,50 @@ const Measurements = () => {
         calves: ''
     });
 
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
         if (!selectedMember) return;
 
-        const updatedMeasurements = [newEntry, ...(selectedMember.measurements || [])];
-        const updatedMember = { ...selectedMember, measurements: updatedMeasurements };
+        try {
+            const payload = {
+                member_id: selectedMember.id,
+                ...newEntry
+            };
 
-        updateMember(updatedMember);
-        setSelectedMember(updatedMember); // Update local view
+            const res = await fetch('/api/measurements', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-        setIsFormOpen(false);
-        setNewEntry({
-            date: new Date().toISOString().split('T')[0],
-            weight: '', chest: '', bicepsL: '', bicepsR: '', waist: '', thigh: '', calves: ''
-        });
+            if (res.ok) {
+                // Optimistically update local state or re-fetch
+                const updatedMeasurements = [payload, ...(selectedMember.measurements || [])];
+                const updatedMember = { ...selectedMember, measurements: updatedMeasurements };
+
+                // We'll just update local context for immediate feedback, 
+                // but real persistence happens via API now.
+                // updateMember(updatedMember); // This might be redundant if we want to rely on fetch, but good for UI.
+
+                // Better: Just append to local view
+                setSelectedMember(prev => ({
+                    ...prev,
+                    measurements: [newEntry, ...(prev.measurements || [])]
+                }));
+
+                setIsFormOpen(false);
+                setNewEntry({
+                    date: new Date().toISOString().split('T')[0],
+                    weight: '', chest: '', bicepsL: '', bicepsR: '', waist: '', thigh: '', calves: ''
+                });
+                alert("Measurements saved successfully!");
+            } else {
+                throw new Error("Failed to save");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Failed to save measurements. Please try again.");
+        }
     };
 
     const filteredMembers = members.filter(m => m.name.toLowerCase().includes(searchTerm.toLowerCase()));

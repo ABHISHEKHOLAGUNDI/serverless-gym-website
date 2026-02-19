@@ -67,7 +67,7 @@ export const GymProvider = ({ children }) => {
 
     // Derived Stats
     const stats = {
-        liveMembers: members.filter(m => m.status === 'Active').length,
+        liveMembers: members.filter(m => m.status?.toLowerCase() === 'active').length,
         totalUsers: members.length,
         birthdaysToday: members.filter(m => {
             if (!m.dob) return false;

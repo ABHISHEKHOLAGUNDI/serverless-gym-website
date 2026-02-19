@@ -1,11 +1,22 @@
 export async function onRequestPost(context) {
     const { request, env } = context;
     try {
-        const { member_id, weight, body_fat, muscle_mass, date } = await request.json();
+        const { member_id, date, weight, chest, bicepsL, bicepsR, waist, thigh, calves } = await request.json();
 
         await env.DB.prepare(
-            "INSERT INTO measurements (member_id, date, weight, body_fat, muscle_mass) VALUES (?, ?, ?, ?, ?)"
-        ).bind(member_id, date || new Date().toISOString().split('T')[0], weight, body_fat, muscle_mass).run();
+            `INSERT INTO measurements (member_id, date, weight, chest, biceps_l, biceps_r, waist, thigh, calves) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        ).bind(
+            member_id,
+            date || new Date().toISOString().split('T')[0],
+            weight || null,
+            chest || null,
+            bicepsL || null,
+            bicepsR || null,
+            waist || null,
+            thigh || null,
+            calves || null
+        ).run();
 
         return Response.json({ success: true });
     } catch (e) {
