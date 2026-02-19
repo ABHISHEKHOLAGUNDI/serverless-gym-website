@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, Home, Users, CalendarCheck, Settings, LogOut, FileText, DollarSign, Activity, MessageSquare, Utensils, Dumbbell, BarChart2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useGymContext } from '../context/GymContext';
 
 const Layout = () => {
+    const { dbError } = useGymContext();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
@@ -29,6 +31,11 @@ const Layout = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-background text-text-primary font-sans">
+            {dbError && (
+                <div className="bg-red-600 text-white text-center py-2 px-4 shadow-md z-[60] font-bold">
+                    ⚠️ {dbError} - Check Cloudflare Bindings!
+                </div>
+            )}
 
             {/* Top Header */}
             <header className="fixed top-0 left-0 right-0 bg-white/70 backdrop-blur-lg border-b border-white/50 px-5 py-3 flex items-center justify-between z-50 shadow-sm">

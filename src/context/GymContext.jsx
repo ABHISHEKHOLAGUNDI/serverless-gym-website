@@ -13,24 +13,51 @@ export const GymProvider = ({ children }) => {
     const [trainers, setTrainers] = useState([]);
     const [machines, setMachines] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [dbError, setDbError] = useState(null);
 
     // Fetch Initial Data
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [membersRes, financesRes, trainersRes, machinesRes] = await Promise.all([
-                    fetch('/api/members?v=' + Date.now()), // Cache busting
-                    fetch('/api/finances?v=' + Date.now()),
-                    fetch('/api/trainers?v=' + Date.now()),
-                    fetch('/api/machines?v=' + Date.now())
-                ]);
+                const endpoints = [
+                    { key: 'members', url: '/api/members' },
+                    { key: 'finances', url: '/api/finances' },
+                    { key: 'trainers', url: '/api/trainers' },
+                    { key: 'machines', url: '/api/machines' }
+                ];
 
-                if (membersRes.ok) setMembers(await membersRes.json());
-                if (financesRes.ok) setTransactions(await financesRes.json());
-                if (trainersRes.ok) setTrainers(await trainersRes.json());
-                if (machinesRes.ok) setMachines(await machinesRes.json());
+                const responses = await Promise.all(
+                    endpoints.map(ep => fetch(`${ep.url}?v=${Date.now()}`))
+                );
+
+                // Check for errors
+                const failed = responses.find(r => !r.ok);
+                if (failed) {
+                    const errText = await failed.text();
+                    let errMsg = `Server Error (${failed.status})`;
+                    try {
+                        const json = JSON.parse(errText);
+                        if (json.error) errMsg = json.error;
+                    } catch (e) { /* ignore */ }
+
+                    console.error("API Error:", errMsg);
+                    setDbError(errMsg);
+                    setLoading(false);
+                    return;
+                }
+
+                // If all OK, parse and set state
+                const data = await Promise.all(responses.map(r => r.json()));
+
+                setMembers(data[0]);
+                setTransactions(data[1]);
+                setTrainers(data[2]);
+                setMachines(data[3]);
+                setDbError(null); // Clear error if successful
+
             } catch (error) {
                 console.error("Failed to fetch data:", error);
+                setDbError("Network Error: Could not connect to server.");
             } finally {
                 setLoading(false);
             }
@@ -224,7 +251,7 @@ export const GymProvider = ({ children }) => {
 
     return (
         <GymContext.Provider value={{
-            members, transactions, trainers, machines, stats, loading,
+            members, transactions, trainers, machines, stats, loading, dbError,
             addMember, updateMember, deleteMember, renewMember,
             addTransaction, deleteTransaction,
             addTrainer, updateTrainer, deleteTrainer,
