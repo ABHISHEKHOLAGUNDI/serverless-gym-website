@@ -7,16 +7,26 @@ CREATE TABLE members (
   plan_type TEXT, -- Monthly, Quarterly, Yearly
   amount REAL,
   start_date DATE DEFAULT (DATE('now')),
-  end_date DATE,
+  expiry_date DATE, -- Changed from end_date to match API
+  dob DATE, -- For Birthday feature
   status TEXT DEFAULT 'active' -- active, expired, inactive
 );
 
-DROP TABLE IF EXISTS staff;
-CREATE TABLE staff (
+DROP TABLE IF EXISTS trainers;
+CREATE TABLE trainers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
-  role TEXT NOT NULL,
-  salary REAL
+  specialty TEXT,
+  phone TEXT
+);
+
+DROP TABLE IF EXISTS machines;
+CREATE TABLE machines (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  status TEXT, -- Operational, Under Maintenance
+  last_maintenance DATE,
+  next_maintenance DATE
 );
 
 DROP TABLE IF EXISTS attendance;
@@ -31,9 +41,10 @@ CREATE TABLE attendance (
 DROP TABLE IF EXISTS finances;
 CREATE TABLE finances (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  type TEXT NOT NULL, -- income, expense
+  type TEXT NOT NULL, -- Income, Expense
   amount REAL NOT NULL,
   date DATE DEFAULT (DATE('now')),
+  category TEXT,
   description TEXT
 );
 
@@ -45,14 +56,5 @@ CREATE TABLE measurements (
   weight REAL,
   body_fat REAL,
   muscle_mass REAL,
-  FOREIGN KEY (member_id) REFERENCES members(id)
-);
-
-DROP TABLE IF EXISTS diet_plans;
-CREATE TABLE diet_plans (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  member_id INTEGER NOT NULL,
-  plan_details TEXT,
-  assigned_date DATE DEFAULT (DATE('now')),
   FOREIGN KEY (member_id) REFERENCES members(id)
 );

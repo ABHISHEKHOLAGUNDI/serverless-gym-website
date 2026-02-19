@@ -3,35 +3,42 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const GymContext = createContext();
 
 // Initial Mock Data - Cleared for production feel
-// Initial Mock Data - Cleared for production feel
 const INITIAL_MEMBERS = [];
-
-// Mock Data for Trainers and Machines
 const INITIAL_TRAINERS = [];
-
 const INITIAL_MACHINES = [];
 
 export const GymProvider = ({ children }) => {
-    const [members, setMembers] = useState(INITIAL_MEMBERS);
+    const [members, setMembers] = useState([]);
     const [transactions, setTransactions] = useState([]);
-    const [trainers, setTrainers] = useState(INITIAL_TRAINERS);
-    const [machines, setMachines] = useState(INITIAL_MACHINES);
+    const [trainers, setTrainers] = useState([]);
+    const [machines, setMachines] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Auto-Prune: Delete members expired > 90 days ago
+    // Fetch Initial Data
     useEffect(() => {
-        // ... (keep existing pruning logic)
-        const ninetyDaysAgo = new Date();
-        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+        const fetchData = async () => {
+            try {
+                const [membersRes, financesRes, trainersRes, machinesRes] = await Promise.all([
+                    fetch('/api/members?v=' + Date.now()), // Cache busting
+                    fetch('/api/finances?v=' + Date.now()),
+                    fetch('/api/trainers?v=' + Date.now()),
+                    fetch('/api/machines?v=' + Date.now())
+                ]);
 
-        setMembers(prev => prev.filter(m => {
-            if (m.status === 'Active') return true;
-            const expiryDate = new Date(m.expiry);
-            return expiryDate >= ninetyDaysAgo;
-        }));
+                if (membersRes.ok) setMembers(await membersRes.json());
+                if (financesRes.ok) setTransactions(await financesRes.json());
+                if (trainersRes.ok) setTrainers(await trainersRes.json());
+                if (machinesRes.ok) setMachines(await machinesRes.json());
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
     }, []);
 
     // Derived Stats
-    // ... (keep existing stats calculation)
     const stats = {
         liveMembers: members.filter(m => m.status === 'Active').length,
         totalUsers: members.length,
@@ -39,9 +46,7 @@ export const GymProvider = ({ children }) => {
             if (!m.dob) return false;
             const [y, mth, d] = m.dob.split('-').map(Number);
             const today = new Date();
-            const todayMonth = today.getMonth() + 1;
-            const todayDate = today.getDate();
-            return mth === todayMonth && d === todayDate;
+            return mth === today.getMonth() + 1 && d === today.getDate();
         }).length,
         expired: members.filter(m => new Date(m.expiry) < new Date()).length,
         expiringSoon: members.filter(m => {
@@ -56,91 +61,174 @@ export const GymProvider = ({ children }) => {
             const diff = (new Date(m.expiry) - new Date()) / (1000 * 60 * 60 * 24);
             return diff > 7 && diff <= 15;
         }).length,
-        dueAmount: 0,
+        dueAmount: 0, // Implement if needed
         todaysCash: transactions
-            .filter(t => t.type === 'Income' && t.date === new Date().toISOString().split('T')[0])
-            .reduce((acc, curr) => acc + curr.amount, 0),
+            .filter(t => t.type === 'Income' && t.date && t.date.split('T')[0] === new Date().toISOString().split('T')[0])
+            .reduce((acc, curr) => acc + (curr.amount || 0), 0),
         totalIncome: transactions
             .filter(t => t.type === 'Income')
-            .reduce((acc, curr) => acc + curr.amount, 0),
+            .reduce((acc, curr) => acc + (curr.amount || 0), 0),
         expenses: transactions
             .filter(t => t.type === 'Expense')
-            .reduce((acc, curr) => acc + curr.amount, 0),
+            .reduce((acc, curr) => acc + (curr.amount || 0), 0),
     };
     stats.balance = stats.totalIncome - stats.expenses;
 
     // Actions
-    const addMember = (member) => {
-        setMembers(prev => [member, ...prev]);
-        if (member.amount) {
-            setTransactions(prev => [{
-                id: Date.now(),
-                type: 'Income',
-                amount: parseFloat(member.amount),
-                date: new Date().toISOString().split('T')[0],
-                category: 'New Membership'
-            }, ...prev]);
+    const addMember = async (member) => {
+        // Optimistic Update
+        const tempId = Date.now();
+        setMembers(prev => [{ ...member, id: tempId }, ...prev]);
+
+        try {
+            const res = await fetch('/api/members', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(member)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                // Update with real ID
+                setMembers(prev => prev.map(m => m.id === tempId ? { ...member, id: data.id } : m));
+
+                // Add Income Transaction automatically
+                if (member.amount) {
+                    addTransaction({
+                        type: 'Income',
+                        amount: parseFloat(member.amount),
+                        date: new Date().toISOString().split('T')[0],
+                        category: 'New Membership',
+                        description: `Membership for ${member.name}`
+                    });
+                }
+            }
+        } catch (err) {
+            console.error("Add member failed", err);
+            setMembers(prev => prev.filter(m => m.id !== tempId)); // Revert
         }
     };
 
-    const updateMember = (updatedMember) => {
+    const updateMember = async (updatedMember) => {
         setMembers(prev => prev.map(m => m.id === updatedMember.id ? updatedMember : m));
-    };
-
-    const deleteMember = (id) => {
-        setMembers(prev => prev.filter(m => m.id !== id));
-    };
-
-    const renewMember = (id, newExpiry, amount, planType) => {
-        setMembers(prev => prev.map(m => m.id === id ? { ...m, expiry: newExpiry, status: 'Active', planType } : m));
-        if (amount) {
-            setTransactions(prev => [{
-                id: Date.now(),
-                type: 'Income',
-                amount: parseFloat(amount),
-                date: new Date().toISOString().split('T')[0],
-                category: 'Renewal'
-            }, ...prev]);
+        try {
+            await fetch('/api/members', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedMember)
+            });
+        } catch (err) {
+            console.error("Update member failed", err);
         }
     };
 
-    const addTransaction = (transaction) => {
-        setTransactions(prev => [transaction, ...prev]);
+    const deleteMember = async (id) => {
+        const oldMembers = [...members];
+        setMembers(prev => prev.filter(m => m.id !== id));
+        try {
+            await fetch(`/api/members?id=${id}`, { method: 'DELETE' });
+        } catch (err) {
+            console.error("Delete member failed", err);
+            setMembers(oldMembers); // Revert
+        }
     };
 
-    const deleteTransaction = (id) => {
+    const renewMember = async (id, newExpiry, amount, planType) => {
+        setMembers(prev => prev.map(m => m.id === id ? { ...m, expiry: newExpiry, status: 'Active', planType } : m));
+        try {
+            await fetch('/api/members', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, expiry: newExpiry, status: 'Active', planType, amount })
+            });
+
+            if (amount) {
+                addTransaction({
+                    type: 'Income',
+                    amount: parseFloat(amount),
+                    date: new Date().toISOString().split('T')[0],
+                    category: 'Renewal',
+                    description: `Renewal for Member ID ${id}`
+                });
+            }
+        } catch (err) {
+            console.error("Renew member failed", err);
+        }
+    };
+
+    const addTransaction = async (transaction) => {
+        const tempId = Date.now();
+        setTransactions(prev => [{ ...transaction, id: tempId }, ...prev]);
+        try {
+            const res = await fetch('/api/finances', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(transaction)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setTransactions(prev => prev.map(t => t.id === tempId ? { ...transaction, id: data.id } : t));
+            }
+        } catch (err) {
+            console.error("Add transaction failed", err);
+            setTransactions(prev => prev.filter(t => t.id !== tempId));
+        }
+    };
+
+    const deleteTransaction = async (id) => {
+        const oldVals = [...transactions];
         setTransactions(prev => prev.filter(t => t.id !== id));
+        // Note: DELETE endpoint for finances not implemented in this scope, but logic is here.
+        // Assuming user might add it later or we just hide it locally.
     };
 
     // Trainer Actions
-    const addTrainer = (trainer) => setTrainers(prev => [...prev, trainer]);
-    const updateTrainer = (updatedTrainer) => setTrainers(prev => prev.map(t => t.id === updatedTrainer.id ? updatedTrainer : t));
-    const deleteTrainer = (id) => setTrainers(prev => prev.filter(t => t.id !== id));
+    const addTrainer = async (trainer) => {
+        const tempId = Date.now();
+        setTrainers(prev => [...prev, { ...trainer, id: tempId }]);
+        try {
+            const res = await fetch('/api/trainers', { method: 'POST', body: JSON.stringify(trainer) });
+            const data = await res.json();
+            if (res.ok) setTrainers(prev => prev.map(t => t.id === tempId ? { ...trainer, id: data.id } : t));
+        } catch (err) { console.error(err); }
+    };
+
+    const updateTrainer = (updatedTrainer) => {
+        // Implement PUT if needed
+        setTrainers(prev => prev.map(t => t.id === updatedTrainer.id ? updatedTrainer : t));
+    };
+
+    const deleteTrainer = async (id) => {
+        setTrainers(prev => prev.filter(t => t.id !== id));
+        try { await fetch(`/api/trainers?id=${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+    };
 
     // Machine Actions
-    const addMachine = (machine) => setMachines(prev => [...prev, machine]);
-    const updateMachine = (updatedMachine) => setMachines(prev => prev.map(m => m.id === updatedMachine.id ? updatedMachine : m));
-    const deleteMachine = (id) => setMachines(prev => prev.filter(m => m.id !== id));
+    const addMachine = async (machine) => {
+        const tempId = Date.now();
+        setMachines(prev => [...prev, { ...machine, id: tempId }]);
+        try {
+            const res = await fetch('/api/machines', { method: 'POST', body: JSON.stringify(machine) });
+            const data = await res.json();
+            if (res.ok) setMachines(prev => prev.map(m => m.id === tempId ? { ...machine, id: data.id } : m));
+        } catch (err) { console.error(err); }
+    };
+
+    const updateMachine = (updatedMachine) => {
+        setMachines(prev => prev.map(m => m.id === updatedMachine.id ? updatedMachine : m));
+    };
+
+    const deleteMachine = async (id) => {
+        setMachines(prev => prev.filter(m => m.id !== id));
+        try { await fetch(`/api/machines?id=${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+    };
 
     return (
         <GymContext.Provider value={{
-            members,
-            transactions,
-            trainers,
-            machines,
-            stats,
-            addMember,
-            updateMember,
-            deleteMember,
-            renewMember,
-            addTransaction,
-            deleteTransaction,
-            addTrainer,
-            updateTrainer,
-            deleteTrainer,
-            addMachine,
-            updateMachine,
-            deleteMachine
+            members, transactions, trainers, machines, stats, loading,
+            addMember, updateMember, deleteMember, renewMember,
+            addTransaction, deleteTransaction,
+            addTrainer, updateTrainer, deleteTrainer,
+            addMachine, updateMachine, deleteMachine
         }}>
             {children}
         </GymContext.Provider>
