@@ -11,6 +11,7 @@ export default {
         surface: 'rgba(17, 24, 39, 0.7)',
         surfaceHighlight: 'rgba(31, 41, 55, 0.8)',
         gold: {
+          300: '#fcd34d',
           400: '#fbbf24',
           500: '#f59e0b',
           600: '#d97706',

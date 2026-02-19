@@ -302,21 +302,20 @@ const Members = () => {
             exit={{ opacity: 0, x: -20 }}
             className="pb-24 px-4 space-y-6 pt-4 relative min-h-screen"
         >
-            {/* Headers and filters */}
+            {/* Header */}
             <div className="flex justify-between items-center mb-2">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Members</h1>
-                    <p className="text-sm text-gray-500">
+                    <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase">Members</h1>
+                    <p className="text-sm text-gray-500 font-tech">
                         {filterParam === 'expired' ? 'Expired Members' : filterParam === 'expiring_soon' ? 'Expiring Soon (1-3 Days)' : 'Manage your gym members'}
                     </p>
                 </div>
-                {/* Clear Filter Button if filtered */}
                 {filterParam && (
-                    <button onClick={() => window.history.back()} className="text-xs bg-gray-100 px-3 py-1 rounded-full text-gray-600">Close Filter</button>
+                    <button onClick={() => window.history.back()} className="text-xs bg-gold-500/10 border border-gold-400/20 px-3 py-1 rounded-full text-gold-400 font-tech">Close Filter</button>
                 )}
                 <button
                     onClick={() => handleOpenModal(false)}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl shadow-blue-500/30 transition-all transform hover:scale-105 active:scale-95"
+                    className="bg-gradient-to-r from-gold-500 to-amber-600 text-black p-3 rounded-full shadow-lg shadow-gold-500/20 transition-all transform hover:scale-105 active:scale-95"
                 >
                     <Plus size={24} />
                 </button>
@@ -325,12 +324,12 @@ const Members = () => {
             {/* Search Bar */}
             <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="text-gray-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+                    <Search className="text-gray-600 group-focus-within:text-gold-400 transition-colors" size={20} />
                 </div>
                 <input
                     type="text"
                     placeholder="Search members..."
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl leading-5 bg-white/70 backdrop-blur-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-all shadow-sm"
+                    className="block w-full pl-10 pr-3 py-3 bg-[#0c1220]/70 border border-gold-400/20 rounded-xl text-white placeholder-gray-700 focus:outline-none focus:border-gold-400 transition-all font-tech"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -356,40 +355,43 @@ const Members = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 style={{ zIndex: activeMenuId === member.id ? 20 : 0 }}
-                                className={`backdrop-blur-md p-4 rounded-2xl flex justify-between items-center border shadow-sm transition-all relative ${isExpired ? 'bg-red-50/80 border-red-100' : 'bg-white/80 border-white/50'
+                                className={`p-4 rounded-xl flex justify-between items-center border transition-all relative ${isExpired
+                                    ? 'bg-red-950/30 border-red-500/20'
+                                    : 'bg-[#0c1220]/70 border-gold-400/10 hover:border-gold-400/30'
                                     }`}
                             >
                                 <div className="flex items-center space-x-4">
                                     {member.photo ? (
-                                        <img src={member.photo} alt={member.name} className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md" />
+                                        <img src={member.photo} alt={member.name} className="w-12 h-12 rounded-full object-cover border-2 border-gold-400/30 shadow-md" />
                                     ) : (
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white shadow-md ${member.status === 'Active' ? 'bg-gradient-to-br from-green-400 to-emerald-600' :
-                                            member.status === 'Expiring' ? 'bg-gradient-to-br from-yellow-400 to-orange-500' : 'bg-gradient-to-br from-gray-400 to-gray-600'
+                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white font-display border ${isExpired ? 'bg-red-900/50 border-red-500/30' :
+                                            isExpiringSoon ? 'bg-amber-900/50 border-amber-500/30' :
+                                                'bg-emerald-900/50 border-emerald-500/30'
                                             }`}>
                                             {member.name.charAt(0)}
                                         </div>
                                     )}
                                     <div>
-                                        <h3 className="font-bold text-gray-900 text-base">{member.name}</h3>
+                                        <h3 className="font-tech font-bold text-white text-base tracking-wider">{member.name}</h3>
                                         <div className="flex flex-col">
-                                            <span className={`text-xs font-medium ${isExpired ? 'text-red-500 font-bold' : 'text-gray-500'}`}>
+                                            <span className={`text-xs font-tech ${isExpired ? 'text-red-400 font-bold' : 'text-gray-500'}`}>
                                                 Exp: {formatDate(member.expiry)}
                                             </span>
-                                            <span className={`text-[10px] uppercase font-bold tracking-wider mt-0.5 ${member.status === 'Active' && !isExpired ? 'text-green-600' :
-                                                isExpired ? 'text-red-500' : 'text-orange-500'
+                                            <span className={`text-[10px] uppercase font-bold tracking-widest mt-0.5 ${isExpired ? 'text-red-500' :
+                                                isExpiringSoon ? 'text-amber-400' :
+                                                    'text-emerald-400'
                                                 }`}>
-                                                {isExpired ? 'Expired' : member.status}
+                                                {isExpired ? 'EXPIRED' : member.status}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="flex space-x-2 items-center relative">
-                                    {/* Expiry Warning Action */}
                                     {isExpiringSoon && (
                                         <button
                                             onClick={() => sendExpiryReminder(member)}
-                                            className="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 border border-yellow-200 transition-colors shadow-sm animate-pulse"
+                                            className="p-2 bg-amber-900/30 text-amber-400 rounded-full hover:bg-amber-900/50 border border-amber-500/20 transition-colors animate-pulse"
                                             title="Send Expiry Reminder"
                                         >
                                             <MessageCircle size={18} />
@@ -399,65 +401,61 @@ const Members = () => {
                                     {isBirthday && (
                                         <button
                                             onClick={() => sendBirthdayWish(member)}
-                                            className="p-2 bg-pink-100 text-pink-600 rounded-full hover:bg-pink-200 border border-pink-200 transition-colors shadow-sm animate-bounce"
+                                            className="p-2 bg-pink-900/30 text-pink-400 rounded-full hover:bg-pink-900/50 border border-pink-500/20 transition-colors animate-bounce"
                                             title="Send Birthday Wish"
                                         >
                                             <Cake size={18} />
                                         </button>
                                     )}
 
-                                    {/* Renew Action for Expired */}
                                     {isExpired && (
                                         <button
                                             onClick={() => handleOpenModal('renew', member)}
-                                            className="p-2 bg-green-100 text-green-700 rounded-full hover:bg-green-200 border border-green-200 transition-colors shadow-sm"
+                                            className="p-2 bg-emerald-900/30 text-emerald-400 rounded-full hover:bg-emerald-900/50 border border-emerald-500/20 transition-colors"
                                             title="Renew Now"
                                         >
                                             <RefreshCw size={18} />
                                         </button>
                                     )}
 
-                                    {/* Native Call Button (Hide if Actions are crowded, or keep small) */}
                                     {!isExpired && !isExpiringSoon && (
                                         <a
                                             href={`tel:${member.phone}`}
-                                            className="p-2 bg-green-50 text-green-600 rounded-full hover:bg-green-100 border border-green-200 transition-colors shadow-sm"
+                                            className="p-2 bg-emerald-900/30 text-emerald-400 rounded-full hover:bg-emerald-900/50 border border-emerald-500/20 transition-colors"
                                         >
                                             <Phone size={18} />
                                         </a>
                                     )}
 
-                                    {/* 3-Dots Menu Trigger */}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setActiveMenuId(activeMenuId === member.id ? null : member.id);
                                         }}
-                                        className="p-2 bg-gray-50 text-gray-500 rounded-full hover:bg-gray-100 border border-gray-200 transition-colors shadow-sm"
+                                        className="p-2 bg-white/5 text-gray-500 rounded-full hover:bg-white/10 border border-white/5 transition-colors"
                                     >
                                         <MoreVertical size={18} />
                                     </button>
-                                    {/* ... (Dropdown Menu remains same) ... */}
                                     <AnimatePresence>
                                         {activeMenuId === member.id && (
                                             <motion.div
                                                 initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                                className="absolute right-0 top-12 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                                                className="absolute right-0 top-12 w-52 bg-[#0a0d14] rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-gold-400/20 z-50 overflow-hidden"
                                             >
-                                                <button onClick={() => generateInvoice({ ...member, amount: '0.00' })} className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                                                    <Download size={16} className="text-blue-500" /> Invoice
+                                                <button onClick={() => generateInvoice({ ...member, amount: '0.00' })} className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-gold-400 flex items-center gap-3 font-tech tracking-wider transition-all">
+                                                    <Download size={15} className="text-blue-400" /> Invoice
                                                 </button>
-                                                <button onClick={() => handleOpenModal('edit', member)} className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                                                    <Edit size={16} className="text-orange-500" /> Edit Details
+                                                <button onClick={() => handleOpenModal('edit', member)} className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-gold-400 flex items-center gap-3 font-tech tracking-wider transition-all">
+                                                    <Edit size={15} className="text-amber-400" /> Edit Details
                                                 </button>
-                                                <button onClick={() => handleOpenModal('renew', member)} className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                                                    <RefreshCw size={16} className="text-green-500" /> Renew
+                                                <button onClick={() => handleOpenModal('renew', member)} className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-gold-400 flex items-center gap-3 font-tech tracking-wider transition-all">
+                                                    <RefreshCw size={15} className="text-emerald-400" /> Renew
                                                 </button>
-                                                <div className="h-px bg-gray-100 my-1"></div>
-                                                <button onClick={() => handleDelete(member.id)} className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                                                    <Trash size={16} /> Delete
+                                                <div className="h-px bg-gold-400/10 my-1"></div>
+                                                <button onClick={() => handleDelete(member.id)} className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-900/20 flex items-center gap-3 font-tech tracking-wider transition-all">
+                                                    <Trash size={15} /> Delete
                                                 </button>
                                             </motion.div>
                                         )}
@@ -467,8 +465,8 @@ const Members = () => {
                         );
                     })
                 ) : (
-                    <div className="text-center py-10 text-gray-400">
-                        <p>No members found</p>
+                    <div className="text-center py-10 text-gray-600">
+                        <p className="font-tech tracking-wider">No members found</p>
                     </div>
                 )}
             </div>
@@ -476,20 +474,20 @@ const Members = () => {
             {/* Add/Edit/Renew Modal */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#02040a]/80 backdrop-blur-sm">
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl"
+                            className="bg-[#0a0d14] border border-gold-400/30 rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-[0_0_60px_rgba(0,0,0,0.8)]"
                         >
                             <div className="p-6 space-y-4">
-                                <div className="flex justify-between items-center border-b pb-2">
-                                    <h2 className="text-2xl font-bold text-gray-900">
+                                <div className="flex justify-between items-center border-b border-gold-400/10 pb-4">
+                                    <h2 className="text-xl font-display font-bold text-gold-400 tracking-widest uppercase">
                                         {editMode === 'edit' ? 'Edit Member' : editMode === 'renew' ? 'Renew Membership' : 'Add New Member'}
                                     </h2>
-                                    <button onClick={() => setIsModalOpen(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
-                                        <X size={20} className="text-gray-500" />
+                                    <button onClick={() => setIsModalOpen(false)} className="p-2 bg-white/5 rounded-full hover:bg-white/10 border border-white/5">
+                                        <X size={20} className="text-gray-400" />
                                     </button>
                                 </div>
 
@@ -497,14 +495,14 @@ const Members = () => {
                                     {/* Photo - Disable for Renew to keep UI clean, enable for Edit/New */}
                                     {editMode !== 'renew' && (
                                         <div className="flex flex-col items-center justify-center gap-2">
-                                            <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative group">
+                                            <div className="w-24 h-24 rounded-full bg-[#050816]/80 border-2 border-dashed border-gold-400/30 flex items-center justify-center overflow-hidden relative group">
                                                 {newMember.photo ? (
                                                     <img src={newMember.photo} alt="Preview" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <span className="text-gray-400 text-xs text-center px-2">Tap to add photo</span>
                                                 )}
                                             </div>
-                                            <label className="text-blue-600 text-sm font-medium cursor-pointer">
+                                            <label className="text-gold-400 text-sm font-tech font-medium cursor-pointer tracking-wider">
                                                 Take Photo / Upload
                                                 <input type="file" accept="image/*" capture="user" onChange={handlePhotoUpload} className="hidden" />
                                             </label>
@@ -512,9 +510,9 @@ const Members = () => {
                                     )}
 
                                     {editMode === 'renew' && (
-                                        <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
-                                            <p className="text-sm text-blue-800 font-medium">Renewing for: <span className="font-bold">{newMember.name}</span></p>
-                                            <p className="text-xs text-blue-600 mt-1">Current Expiry: {formatDate(members.find(m => m.id === selectedMemberId)?.expiry)}</p>
+                                        <div className="bg-gold-500/10 border border-gold-400/20 p-3 rounded-xl">
+                                            <p className="text-sm text-gold-300 font-tech">Renewing for: <span className="font-bold text-gold-400">{newMember.name}</span></p>
+                                            <p className="text-xs text-gold-500/70 mt-1 font-tech">Current Expiry: {formatDate(members.find(m => m.id === selectedMemberId)?.expiry)}</p>
                                         </div>
                                     )}
 
@@ -522,31 +520,31 @@ const Members = () => {
                                         required
                                         type="text"
                                         placeholder="Full Name"
-                                        className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                        className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all disabled:opacity-50"
                                         value={newMember.name}
                                         onChange={e => setNewMember({ ...newMember, name: e.target.value })}
-                                        disabled={editMode === 'renew'} // Lock name during renewal
+                                        disabled={editMode === 'renew'}
                                     />
 
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="flex flex-col gap-1">
-                                            <label className="text-xs text-gray-500 ml-1">Phone Number</label>
+                                            <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Phone Number</label>
                                             <input
                                                 required
                                                 type="tel"
                                                 placeholder="Phone Number"
-                                                className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                                className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all disabled:opacity-50"
                                                 value={newMember.phone}
                                                 onChange={e => setNewMember({ ...newMember, phone: e.target.value })}
                                                 disabled={editMode === 'renew'}
                                             />
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <label className="text-xs text-gray-500 ml-1">Height (cm)</label>
+                                            <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Height (cm)</label>
                                             <input
                                                 type="number"
                                                 placeholder="Height (cm)"
-                                                className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                                className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all"
                                                 value={newMember.height}
                                                 onChange={e => setNewMember({ ...newMember, height: e.target.value })}
                                             />
@@ -554,27 +552,27 @@ const Members = () => {
                                     </div>
 
                                     <div className="flex flex-col gap-1">
-                                        <label className="text-xs text-gray-500 ml-1">Date of Birth</label>
+                                        <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Date of Birth</label>
                                         <input
                                             type="date"
-                                            className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                            className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all"
                                             value={newMember.dob}
                                             onChange={e => setNewMember({ ...newMember, dob: e.target.value })}
                                         />
                                     </div>
 
-                                    {/* Modern Tabs for Plan Type */}
+                                    {/* Plan Type Tabs */}
                                     <div className="space-y-1">
-                                        <label className="text-xs text-gray-500 ml-1">Plan Type</label>
-                                        <div className="flex bg-gray-100 p-1 rounded-xl">
+                                        <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Plan Type</label>
+                                        <div className="flex bg-[#050816]/80 border border-gold-400/15 p-1 rounded-xl">
                                             {['Monthly', 'Quarterly', 'Yearly'].map((plan) => (
                                                 <button
                                                     type="button"
                                                     key={plan}
                                                     onClick={() => setNewMember({ ...newMember, planType: plan })}
-                                                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${newMember.planType === plan
-                                                        ? 'bg-white text-blue-600 shadow-sm'
-                                                        : 'text-gray-500 hover:text-gray-700'
+                                                    className={`flex-1 py-2 rounded-lg text-sm font-tech font-medium tracking-wider transition-all ${newMember.planType === plan
+                                                        ? 'bg-gradient-to-r from-gold-500 to-amber-600 text-black shadow-sm'
+                                                        : 'text-gray-600 hover:text-gray-400'
                                                         }`}
                                                 >
                                                     {plan}
@@ -586,42 +584,42 @@ const Members = () => {
                                     <input
                                         type="number"
                                         placeholder="Amount (₹)"
-                                        className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all"
                                         value={newMember.amount}
                                         onChange={e => setNewMember({ ...newMember, amount: e.target.value })}
                                     />
 
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="flex flex-col gap-1">
-                                            <label className="text-xs text-gray-500 ml-1">Start Date</label>
+                                            <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Start Date</label>
                                             <input
                                                 type="date"
-                                                className="p-3 bg-gray-50 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                className="p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all"
                                                 value={newMember.startDate}
                                                 onChange={e => setNewMember({ ...newMember, startDate: e.target.value })}
                                             />
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <label className="text-xs text-gray-500 ml-1">End Date (Auto)</label>
+                                            <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">End Date (Auto)</label>
                                             <input
                                                 type="date"
                                                 disabled
-                                                className="p-3 bg-gray-100 text-gray-500 rounded-xl border border-gray-200 outline-none"
+                                                className="p-3 bg-[#050816]/60 border border-white/5 text-gray-600 rounded-xl outline-none font-tech"
                                                 value={newMember.endDate}
                                             />
                                         </div>
                                     </div>
 
                                     <div className="flex flex-col gap-1">
-                                        <label className="text-xs text-gray-500 ml-1">Assign Trainer</label>
+                                        <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Assign Trainer</label>
                                         <select
-                                            className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all appearance-none"
+                                            className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all appearance-none"
                                             value={newMember.trainerId || ''}
                                             onChange={e => setNewMember({ ...newMember, trainerId: parseInt(e.target.value) })}
                                         >
-                                            <option value="">No Trainer Assigned</option>
+                                            <option value="" className="bg-[#0a0d14]">No Trainer Assigned</option>
                                             {trainers && trainers.map(t => (
-                                                <option key={t.id} value={t.id}>{t.name} ({t.specialty})</option>
+                                                <option key={t.id} value={t.id} className="bg-[#0a0d14]">{t.name} ({t.specialty})</option>
                                             ))}
                                         </select>
                                     </div>
@@ -630,13 +628,13 @@ const Members = () => {
                                         <button
                                             type="button"
                                             onClick={() => setIsModalOpen(false)}
-                                            className="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors"
+                                            className="flex-1 py-3 text-gray-500 font-tech font-bold bg-white/5 border border-white/5 rounded-xl tracking-wider hover:bg-white/10 transition-colors"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
-                                            className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200"
+                                            className="flex-1 py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-black font-bold font-tech rounded-xl shadow-lg shadow-gold-500/10 tracking-wider hover:opacity-90"
                                         >
                                             {editMode === 'add' ? 'Add Member' : editMode === 'renew' ? 'Renew Membership' : 'Save Changes'}
                                         </button>

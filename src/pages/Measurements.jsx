@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Ruler, History, Save, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Plus, History, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { useGymContext } from '../context/GymContext';
 
+const INPUT_CLASS = "w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all placeholder-gray-700";
+const LABEL_CLASS = "text-xs font-tech text-gray-500 uppercase tracking-widest block mb-1";
+
 const Measurements = () => {
-    const { members, updateMember } = useGymContext();
+    const { members } = useGymContext();
     const [selectedMember, setSelectedMember] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
 
-    // Fetch measurements when member is selected
     React.useEffect(() => {
         if (selectedMember) {
             fetch(`/api/measurements?member_id=${selectedMember.id}&v=${Date.now()}`)
@@ -25,13 +27,7 @@ const Measurements = () => {
 
     const [newEntry, setNewEntry] = useState({
         date: new Date().toISOString().split('T')[0],
-        weight: '',
-        chest: '',
-        bicepsL: '',
-        bicepsR: '',
-        waist: '',
-        thigh: '',
-        calves: ''
+        weight: '', chest: '', bicepsL: '', bicepsR: '', waist: '', thigh: '', calves: ''
     });
 
     const handleSave = async (e) => {
@@ -39,11 +35,7 @@ const Measurements = () => {
         if (!selectedMember) return;
 
         try {
-            const payload = {
-                member_id: selectedMember.id,
-                ...newEntry
-            };
-
+            const payload = { member_id: selectedMember.id, ...newEntry };
             const res = await fetch('/api/measurements', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -51,25 +43,12 @@ const Measurements = () => {
             });
 
             if (res.ok) {
-                // Optimistically update local state or re-fetch
-                const updatedMeasurements = [payload, ...(selectedMember.measurements || [])];
-                const updatedMember = { ...selectedMember, measurements: updatedMeasurements };
-
-                // We'll just update local context for immediate feedback, 
-                // but real persistence happens via API now.
-                // updateMember(updatedMember); // This might be redundant if we want to rely on fetch, but good for UI.
-
-                // Better: Just append to local view
                 setSelectedMember(prev => ({
                     ...prev,
                     measurements: [newEntry, ...(prev.measurements || [])]
                 }));
-
                 setIsFormOpen(false);
-                setNewEntry({
-                    date: new Date().toISOString().split('T')[0],
-                    weight: '', chest: '', bicepsL: '', bicepsR: '', waist: '', thigh: '', calves: ''
-                });
+                setNewEntry({ date: new Date().toISOString().split('T')[0], weight: '', chest: '', bicepsL: '', bicepsR: '', waist: '', thigh: '', calves: '' });
                 alert("Measurements saved successfully!");
             } else {
                 const errData = await res.json();
@@ -89,17 +68,17 @@ const Measurements = () => {
             animate={{ opacity: 1, x: 0 }}
             className="pb-24 px-4 space-y-6 pt-4 relative min-h-screen"
         >
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-4">Measurements</h1>
+            <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase">Measurements</h1>
 
-            {/* Member Selector (if not selected) */}
             {!selectedMember ? (
+                // Member Selector
                 <div className="space-y-4">
                     <div className="relative">
-                        <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
+                        <Search className="absolute left-3 top-3.5 text-gray-600" size={20} />
                         <input
                             type="text"
                             placeholder="Search member to view/add..."
-                            className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full pl-10 pr-4 py-3 bg-[#0c1220]/70 border border-gold-400/20 focus:border-gold-400 rounded-xl text-white outline-none font-tech placeholder-gray-700 transition-all"
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                         />
@@ -109,10 +88,10 @@ const Measurements = () => {
                             <div
                                 key={member.id}
                                 onClick={() => setSelectedMember(member)}
-                                className="p-4 bg-white rounded-xl border border-gray-100 flex justify-between items-center cursor-pointer hover:bg-blue-50 transition-colors"
+                                className="p-4 bg-[#0c1220]/70 border border-gold-400/10 hover:border-gold-400/40 rounded-xl flex justify-between items-center cursor-pointer transition-all group"
                             >
-                                <span className="font-semibold text-gray-800">{member.name}</span>
-                                <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">ID: {member.id}</span>
+                                <span className="font-tech font-semibold text-gray-300 group-hover:text-gold-400 transition-colors tracking-wider">{member.name}</span>
+                                <span className="text-xs bg-gold-500/10 text-gold-500 px-2 py-1 rounded font-tech border border-gold-500/20">ID: {member.id}</span>
                             </div>
                         ))}
                     </div>
@@ -120,25 +99,27 @@ const Measurements = () => {
             ) : (
                 // Selected Member View
                 <div className="space-y-6">
-                    {/* Header with Back */}
-                    <div className="flex justify-between items-center bg-blue-600 p-4 rounded-xl text-white shadow-lg shadow-blue-200">
+                    {/* Member Header */}
+                    <div className="flex justify-between items-center bg-gradient-to-r from-gold-900/30 to-transparent border border-gold-400/30 p-4 rounded-xl text-white shadow-[0_0_20px_rgba(0,0,0,0.4)]">
                         <div>
-                            <h2 className="text-xl font-bold">{selectedMember.name}</h2>
-                            <p className="text-blue-100 text-sm">Height: {selectedMember.height || 'N/A'} cm</p>
+                            <h2 className="text-xl font-display font-bold text-gold-400 tracking-wider">{selectedMember.name}</h2>
+                            <p className="text-gray-500 text-sm font-tech">Height: {selectedMember.height || 'N/A'} cm</p>
                         </div>
                         <button
                             onClick={() => setSelectedMember(null)}
-                            className="bg-white/20 hover:bg-white/30 p-2 rounded-lg text-xs"
-                        >Change</button>
+                            className="flex items-center gap-1 bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-tech text-gray-400 hover:text-white transition-all"
+                        >
+                            <ArrowLeft size={14} /> Change
+                        </button>
                     </div>
 
                     {/* Add New Button */}
                     <button
                         onClick={() => setIsFormOpen(!isFormOpen)}
-                        className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg"
+                        className="w-full py-3 bg-[#0c1220]/80 border border-gold-400/20 hover:border-gold-400/50 text-gold-400 rounded-xl font-tech font-semibold flex items-center justify-center gap-2 shadow-lg transition-all tracking-wider"
                     >
                         {isFormOpen ? <ChevronUp size={20} /> : <Plus size={20} />}
-                        {isFormOpen ? 'Cancel Entry' : 'Add New Measurements'}
+                        {isFormOpen ? 'Cancel Entry' : '+ Add New Measurements'}
                     </button>
 
                     {/* Entry Form */}
@@ -149,58 +130,49 @@ const Measurements = () => {
                                 animate={{ height: 'auto', opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
                                 onSubmit={handleSave}
-                                className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
+                                className="bg-[#0a0d14]/90 border border-gold-400/20 p-5 rounded-2xl overflow-hidden"
                             >
                                 <div className="space-y-4">
                                     <div className="flex flex-col">
-                                        <label className="text-xs font-bold text-gray-500 uppercase">Date</label>
-                                        <input
-                                            type="date"
-                                            required
-                                            value={newEntry.date}
+                                        <label className={LABEL_CLASS}>Date</label>
+                                        <input type="date" required value={newEntry.date}
                                             onChange={e => setNewEntry({ ...newEntry, date: e.target.value })}
-                                            className="p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none"
-                                        />
+                                            className={INPUT_CLASS} />
                                     </div>
 
-                                    {/* Compulsory Fields */}
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-xs font-bold text-blue-600 uppercase">Weight (kg) *</label>
-                                            <input type="number" required placeholder="0.0" className="w-full p-3 bg-blue-50/50 border border-blue-100 rounded-xl outline-none"
-                                                value={newEntry.weight} onChange={e => setNewEntry({ ...newEntry, weight: e.target.value })} />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-bold text-blue-600 uppercase">Chest (in) *</label>
-                                            <input type="number" required placeholder="0.0" className="w-full p-3 bg-blue-50/50 border border-blue-100 rounded-xl outline-none"
-                                                value={newEntry.chest} onChange={e => setNewEntry({ ...newEntry, chest: e.target.value })} />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-bold text-blue-600 uppercase">L. Biceps (in) *</label>
-                                            <input type="number" required placeholder="0.0" className="w-full p-3 bg-blue-50/50 border border-blue-100 rounded-xl outline-none"
-                                                value={newEntry.bicepsL} onChange={e => setNewEntry({ ...newEntry, bicepsL: e.target.value })} />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-bold text-blue-600 uppercase">R. Biceps (in) *</label>
-                                            <input type="number" required placeholder="0.0" className="w-full p-3 bg-blue-50/50 border border-blue-100 rounded-xl outline-none"
-                                                value={newEntry.bicepsR} onChange={e => setNewEntry({ ...newEntry, bicepsR: e.target.value })} />
-                                        </div>
+                                        {[
+                                            { label: 'Weight (kg) *', key: 'weight' },
+                                            { label: 'Chest (in) *', key: 'chest' },
+                                            { label: 'L. Biceps (in) *', key: 'bicepsL' },
+                                            { label: 'R. Biceps (in) *', key: 'bicepsR' },
+                                        ].map(f => (
+                                            <div key={f.key}>
+                                                <label className="text-xs font-tech text-gold-600 uppercase tracking-widest block mb-1">{f.label}</label>
+                                                <input type="number" required placeholder="0.0"
+                                                    className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all"
+                                                    value={newEntry[f.key]}
+                                                    onChange={e => setNewEntry({ ...newEntry, [f.key]: e.target.value })} />
+                                            </div>
+                                        ))}
                                     </div>
 
-                                    <div className="border-t border-gray-100 my-2"></div>
-
-                                    {/* Optional Fields */}
-                                    <p className="text-xs font-bold text-gray-400 uppercase">Optional</p>
+                                    <div className="border-t border-gold-400/10 my-2"></div>
+                                    <p className="text-xs font-tech text-gray-600 uppercase tracking-widest">Optional</p>
                                     <div className="grid grid-cols-3 gap-3">
-                                        <input type="number" placeholder="Waist" className="p-2 bg-gray-50 rounded-lg text-sm outline-none"
-                                            value={newEntry.waist} onChange={e => setNewEntry({ ...newEntry, waist: e.target.value })} />
-                                        <input type="number" placeholder="Thigh" className="p-2 bg-gray-50 rounded-lg text-sm outline-none"
-                                            value={newEntry.thigh} onChange={e => setNewEntry({ ...newEntry, thigh: e.target.value })} />
-                                        <input type="number" placeholder="Calves" className="p-2 bg-gray-50 rounded-lg text-sm outline-none"
-                                            value={newEntry.calves} onChange={e => setNewEntry({ ...newEntry, calves: e.target.value })} />
+                                        {[
+                                            { p: 'Waist', k: 'waist' },
+                                            { p: 'Thigh', k: 'thigh' },
+                                            { p: 'Calves', k: 'calves' },
+                                        ].map(f => (
+                                            <input key={f.k} type="number" placeholder={f.p}
+                                                className="p-2 bg-[#050816]/80 border border-white/10 rounded-lg text-sm outline-none text-white font-tech focus:border-gold-400/50 transition-all"
+                                                value={newEntry[f.k]}
+                                                onChange={e => setNewEntry({ ...newEntry, [f.k]: e.target.value })} />
+                                        ))}
                                     </div>
 
-                                    <button type="submit" className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg transition-transform active:scale-95">
+                                    <button type="submit" className="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 hover:opacity-90 text-black rounded-xl font-bold font-display tracking-widest shadow-lg transition-transform active:scale-95">
                                         Save Measurements
                                     </button>
                                 </div>
@@ -208,31 +180,41 @@ const Measurements = () => {
                         )}
                     </AnimatePresence>
 
-                    {/* History List */}
+                    {/* History */}
                     <div className="space-y-3">
-                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><History size={18} /> History</h3>
+                        <h3 className="font-display font-bold text-gold-400 tracking-widest uppercase flex items-center gap-2 text-sm">
+                            <History size={16} /> History
+                        </h3>
                         {!selectedMember.measurements || selectedMember.measurements.length === 0 ? (
-                            <p className="text-gray-400 text-center py-4">No measurements recorded yet.</p>
+                            <p className="text-gray-600 text-center py-4 font-tech tracking-wider">No measurements recorded yet.</p>
                         ) : (
                             selectedMember.measurements.map((entry, idx) => (
-                                <div key={idx} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
-                                    <div className="flex justify-between items-end mb-2 border-b border-gray-50 pb-2">
-                                        <span className="text-sm text-gray-500 font-medium">{new Date(entry.date).toLocaleDateString('en-GB')}</span>
-                                        <span className="text-lg font-bold text-gray-900">{entry.weight} <span className="text-xs font-medium text-gray-400">kg</span></span>
+                                <div key={idx} className="bg-[#0c1220]/70 border border-gold-400/10 hover:border-gold-400/25 p-4 rounded-xl transition-all">
+                                    <div className="flex justify-between items-end mb-3 border-b border-gold-400/10 pb-2">
+                                        <span className="text-sm text-gray-500 font-tech">{new Date(entry.date).toLocaleDateString('en-GB')}</span>
+                                        <span className="text-xl font-display font-bold text-gold-400">
+                                            {entry.weight} <span className="text-xs font-tech text-gray-500">kg</span>
+                                        </span>
                                     </div>
                                     <div className="grid grid-cols-4 gap-2 text-center">
-                                        <div className="bg-gray-50 rounded-lg p-1">
-                                            <div className="text-[10px] text-gray-400 uppercase">Chest</div>
-                                            <div className="font-semibold text-sm">{entry.chest}"</div>
+                                        <div className="bg-[#050816]/60 border border-white/5 rounded-lg p-2">
+                                            <div className="text-[10px] text-gray-600 uppercase font-tech">Chest</div>
+                                            <div className="font-semibold text-sm text-gray-300">{entry.chest}"</div>
                                         </div>
-                                        <div className="bg-gray-50 rounded-lg p-1">
-                                            <div className="text-[10px] text-gray-400 uppercase">Arms</div>
-                                            <div className="font-semibold text-sm">{entry.bicepsL}" / {entry.bicepsR}"</div>
+                                        <div className="bg-[#050816]/60 border border-white/5 rounded-lg p-2">
+                                            <div className="text-[10px] text-gray-600 uppercase font-tech">Arms</div>
+                                            <div className="font-semibold text-sm text-gray-300">{entry.bicepsL}" / {entry.bicepsR}"</div>
                                         </div>
                                         {entry.waist && (
-                                            <div className="bg-gray-50 rounded-lg p-1">
-                                                <div className="text-[10px] text-gray-400 uppercase">Waist</div>
-                                                <div className="font-semibold text-sm">{entry.waist}"</div>
+                                            <div className="bg-[#050816]/60 border border-white/5 rounded-lg p-2">
+                                                <div className="text-[10px] text-gray-600 uppercase font-tech">Waist</div>
+                                                <div className="font-semibold text-sm text-gray-300">{entry.waist}"</div>
+                                            </div>
+                                        )}
+                                        {entry.thigh && (
+                                            <div className="bg-[#050816]/60 border border-white/5 rounded-lg p-2">
+                                                <div className="text-[10px] text-gray-600 uppercase font-tech">Thigh</div>
+                                                <div className="font-semibold text-sm text-gray-300">{entry.thigh}"</div>
                                             </div>
                                         )}
                                     </div>

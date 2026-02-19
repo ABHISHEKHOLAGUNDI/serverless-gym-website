@@ -1,8 +1,8 @@
-import { useState } from 'react'; // Added useState
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGymContext } from '../context/GymContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, TrendingDown, DollarSign, Calendar } from 'lucide-react';
+import { Plus, Trash2, TrendingDown, TrendingUp, DollarSign, Calendar, X } from 'lucide-react';
 
 const Expenses = () => {
     const { transactions, addTransaction, deleteTransaction } = useGymContext();
@@ -52,17 +52,18 @@ const Expenses = () => {
             description: newExpense.description
         });
         setIsModalOpen(false);
-        setNewExpense({
-            amount: '',
-            category: 'Rent',
-            date: new Date().toISOString().split('T')[0],
-            description: ''
-        });
+        setNewExpense({ amount: '', category: 'Rent', date: new Date().toISOString().split('T')[0], description: '' });
     };
 
     const categories = ['Rent', 'Utilities', 'Maintenance', 'Equipment', 'Salary', 'Marketing', 'Other'];
 
-    const themeColor = activeTab === 'Income' ? 'green' : activeTab === 'Expenses' ? 'red' : 'purple';
+    const statsBg = activeTab === 'Income'
+        ? 'from-emerald-900/60 to-green-900/40 border-emerald-500/30'
+        : activeTab === 'Expenses'
+            ? 'from-red-900/60 to-rose-900/40 border-red-500/30'
+            : 'from-purple-900/60 to-indigo-900/40 border-purple-500/30';
+
+    const statsColor = activeTab === 'Income' ? 'text-emerald-400' : activeTab === 'Expenses' ? 'text-red-400' : 'text-purple-400';
 
     return (
         <motion.div
@@ -70,48 +71,55 @@ const Expenses = () => {
             animate={{ opacity: 1, x: 0 }}
             className="pb-24 px-4 space-y-6 pt-4 relative min-h-screen"
         >
+            {/* Header */}
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Financials</h1>
+                <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase">Financials</h1>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg shadow-red-200 transition-all font-semibold"
+                    className="bg-gradient-to-r from-gold-500 to-amber-600 text-black px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg shadow-gold-500/20 transition-all font-bold font-tech tracking-wider hover:opacity-90"
                 >
                     <Plus size={18} /> Add Expense
                 </button>
             </div>
 
-            {/* Tabs */}
-            <div className="bg-gray-100 p-1 rounded-xl flex">
+            {/* Tab Switcher */}
+            <div className="bg-[#0a0d14]/80 border border-gold-400/20 p-1 rounded-xl flex gap-1">
                 {['Expenses', 'Income', 'All'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => handleTabChange(tab)}
-                        className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === tab ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`flex-1 py-2 rounded-lg text-sm font-tech tracking-wider transition-all ${activeTab === tab
+                                ? 'bg-gold-500/20 border border-gold-400/40 text-gold-400 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-300'
+                            }`}
                     >
                         {tab}
                     </button>
                 ))}
             </div>
 
-            {/* Stats */}
-            <div className={`bg-gradient-to-br ${activeTab === 'Income' ? 'from-green-500 to-emerald-600 shadow-green-200' : activeTab === 'Expenses' ? 'from-red-500 to-rose-600 shadow-red-200' : 'from-purple-500 to-indigo-600 shadow-purple-200'} rounded-2xl p-6 text-white shadow-xl relative overflow-hidden transition-colors duration-500`}>
+            {/* Stats Banner */}
+            <div className={`bg-gradient-to-br ${statsBg} border rounded-2xl p-6 text-white relative overflow-hidden`}>
                 <div className="relative z-10">
-                    <p className="text-white/80 font-medium text-sm">
+                    <p className="text-gray-400 font-tech text-sm tracking-wider uppercase">
                         Total {activeTab} {dateParam === 'today' ? '(Today)' : ''}
                     </p>
-                    <h2 className="text-3xl font-bold mt-1">
-                        ₹{totalAmount.toLocaleString()}
+                    <h2 className={`text-4xl font-display font-bold mt-1 ${statsColor}`}>
+                        ₹{Math.abs(totalAmount).toLocaleString()}
                     </h2>
                 </div>
-                <TrendingDown className="absolute right-4 bottom-4 text-white opacity-20 w-24 h-24" />
+                {activeTab === 'Income'
+                    ? <TrendingUp className="absolute right-4 bottom-4 text-emerald-500 opacity-10 w-24 h-24" />
+                    : <TrendingDown className="absolute right-4 bottom-4 text-red-500 opacity-10 w-24 h-24" />
+                }
             </div>
 
-            {/* List */}
+            {/* Transaction List */}
             <div className="space-y-3">
                 {filteredTransactions.length === 0 ? (
-                    <div className="text-center py-10 text-gray-400">
+                    <div className="text-center py-10 text-gray-600">
                         <DollarSign className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                        <p>No transactions found.</p>
+                        <p className="font-tech tracking-wider">No transactions found.</p>
                     </div>
                 ) : (
                     filteredTransactions.map(t => (
@@ -119,28 +127,28 @@ const Expenses = () => {
                             key={t.id}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center"
+                            className="bg-[#0c1220]/70 border border-gold-400/10 hover:border-gold-400/30 p-4 rounded-xl flex justify-between items-center transition-all"
                         >
                             <div className="flex items-center gap-4">
-                                <div className={`p-3 rounded-full ${t.type === 'Income' ? 'bg-green-50 text-green-500' : 'bg-red-50 text-red-500'}`}>
+                                <div className={`p-3 rounded-full ${t.type === 'Income' ? 'bg-emerald-900/40 text-emerald-400 border border-emerald-500/20' : 'bg-red-900/40 text-red-400 border border-red-500/20'}`}>
                                     <DollarSign size={20} />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-800">{t.category}</h3>
-                                    <p className="text-xs text-gray-500 flex items-center gap-1">
-                                        <Calendar size={12} /> {new Date(t.date).toLocaleDateString()}
-                                        {t.description && <span className="text-gray-400">• {t.description}</span>}
+                                    <h3 className="font-tech font-bold text-white tracking-wider uppercase text-sm">{t.category}</h3>
+                                    <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                        <Calendar size={11} /> {new Date(t.date).toLocaleDateString()}
+                                        {t.description && <span className="text-gray-600">• {t.description}</span>}
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <span className={`font-bold px-3 py-1 rounded-lg ${t.type === 'Income' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>
+                                <span className={`font-bold font-display text-lg tracking-wider ${t.type === 'Income' ? 'text-emerald-400' : 'text-red-400'}`}>
                                     {t.type === 'Income' ? '+' : '-'} ₹{t.amount}
                                 </span>
                                 {t.type === 'Expense' && (
                                     <button
                                         onClick={() => deleteTransaction(t.id)}
-                                        className="p-2 bg-gray-100 rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors"
+                                        className="p-2 bg-white/5 rounded-lg text-gray-600 hover:bg-red-900/30 hover:text-red-400 transition-colors border border-white/5"
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -151,76 +159,57 @@ const Expenses = () => {
                 )}
             </div>
 
-            {/* Modal */}
+            {/* Add Expense Modal */}
             <AnimatePresence>
                 {isModalOpen && (
                     <>
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 0.5 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black z-50 backdrop-blur-sm"
+                            initial={{ opacity: 0 }} animate={{ opacity: 0.7 }} exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-[#02040a] z-50 backdrop-blur-sm"
                             onClick={() => setIsModalOpen(false)}
                         />
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="fixed inset-x-4 top-[15%] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[500px] bg-white rounded-3xl z-50 p-6 shadow-2xl"
+                            className="fixed inset-x-4 top-[10%] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[500px] bg-[#0a0d14] border border-gold-400/30 rounded-3xl z-50 p-6 shadow-[0_0_60px_rgba(0,0,0,0.8)]"
                         >
-                            <h2 className="text-xl font-bold mb-4">Add New Expense</h2>
+                            <div className="flex justify-between items-center mb-5">
+                                <h2 className="text-xl font-display font-bold text-gold-400 tracking-widest uppercase">Add New Expense</h2>
+                                <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white"><X size={22} /></button>
+                            </div>
                             <form onSubmit={handleSubmit} className="space-y-4">
+                                {[
+                                    { label: 'Amount (₹)', key: 'amount', type: 'number' },
+                                    { label: 'Date', key: 'date', type: 'date' },
+                                    { label: 'Description (Optional)', key: 'description', type: 'text' }
+                                ].map(field => (
+                                    <div key={field.key}>
+                                        <label className="text-xs font-tech text-gray-500 uppercase tracking-widest block mb-1">{field.label}</label>
+                                        <input
+                                            type={field.type}
+                                            required={field.key !== 'description'}
+                                            className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all"
+                                            value={newExpense[field.key]}
+                                            onChange={e => setNewExpense({ ...newExpense, [field.key]: e.target.value })}
+                                        />
+                                    </div>
+                                ))}
                                 <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase">Amount (₹)</label>
-                                    <input
-                                        type="number"
-                                        required
-                                        className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-red-500"
-                                        value={newExpense.amount}
-                                        onChange={e => setNewExpense({ ...newExpense, amount: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase">Category</label>
+                                    <label className="text-xs font-tech text-gray-500 uppercase tracking-widest block mb-1">Category</label>
                                     <select
-                                        className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none"
+                                        className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 rounded-xl outline-none text-white font-tech"
                                         value={newExpense.category}
                                         onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}
                                     >
-                                        {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                                        {categories.map(c => <option key={c} value={c} className="bg-[#0a0d14]">{c}</option>)}
                                     </select>
                                 </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase">Date</label>
-                                    <input
-                                        type="date"
-                                        required
-                                        className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none"
-                                        value={newExpense.date}
-                                        onChange={e => setNewExpense({ ...newExpense, date: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase">Description (Optional)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none"
-                                        value={newExpense.description}
-                                        onChange={e => setNewExpense({ ...newExpense, description: e.target.value })}
-                                    />
-                                </div>
                                 <div className="flex gap-4 pt-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsModalOpen(false)}
-                                        className="flex-1 py-3 items-center justify-center rounded-xl font-bold bg-gray-100 text-gray-500"
-                                    >
+                                    <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 rounded-xl font-bold font-tech bg-white/5 text-gray-400 border border-white/5 tracking-wider">
                                         Cancel
                                     </button>
-                                    <button
-                                        type="submit"
-                                        className="flex-1 py-3 items-center justify-center rounded-xl font-bold bg-red-500 text-white shadow-lg shadow-red-200"
-                                    >
+                                    <button type="submit" className="flex-1 py-3 rounded-xl font-bold font-tech bg-gradient-to-r from-gold-500 to-amber-600 text-black shadow-lg shadow-gold-500/10 tracking-wider hover:opacity-90">
                                         Save Expense
                                     </button>
                                 </div>
