@@ -72,11 +72,12 @@ const Measurements = () => {
                 });
                 alert("Measurements saved successfully!");
             } else {
-                throw new Error("Failed to save");
+                const errData = await res.json();
+                throw new Error(errData.error || "Failed to save");
             }
         } catch (err) {
             console.error(err);
-            alert("Failed to save measurements. Please try again.");
+            alert(`Failed to save measurements: ${err.message}`);
         }
     };
 
