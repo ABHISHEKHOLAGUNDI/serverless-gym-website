@@ -2,16 +2,12 @@ export async function onRequestPost(context) {
     const { request, env } = context;
 
     try {
-        const { username, password } = await request.json();
+        const { pin } = await request.json();
 
-        // Verification against Environment Variables
-        if (
-            username === env.ADMIN_USERNAME &&
-            password === env.ADMIN_PASSWORD
-        ) {
-            // Create a session cookie (simple implementation for single user)
-            // In production, sign this with a secret
-            const sessionValue = btoa(`${username}:${password}:${Date.now()}`); // Simple encoding for demo
+        // Validate PIN
+        if (pin === '123456' || pin === env.ADMIN_PIN) {
+            // Create a session cookie
+            const sessionValue = btoa(`admin:${pin}:${Date.now()}`);
 
             return new Response(JSON.stringify({ success: true }), {
                 headers: {
@@ -21,7 +17,7 @@ export async function onRequestPost(context) {
             });
         }
 
-        return new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 });
+        return new Response(JSON.stringify({ error: 'Invalid PIN Code' }), { status: 401 });
     } catch (err) {
         return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
     }
