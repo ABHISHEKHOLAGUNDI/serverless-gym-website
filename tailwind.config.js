@@ -7,21 +7,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0a0a0a',
-        surface: '#121212',
-        surfaceHighlight: '#1e1e1e',
-        neon: {
-          cyan: '#00f3ff',
-          green: '#00ff9d',
-          pink: '#ff00ff',
+        background: '#050816', // Deep Space
+        surface: 'rgba(17, 24, 39, 0.7)',
+        surfaceHighlight: 'rgba(31, 41, 55, 0.8)',
+        gold: {
+          400: '#fbbf24',
+          500: '#f59e0b',
+          600: '#d97706',
+          glow: 'rgba(251, 191, 36, 0.5)',
         },
         text: {
-            primary: '#e0e0e0',
-            secondary: '#a0a0a0',
+          primary: '#f3f4f6',
+          secondary: '#9ca3af',
+          accent: '#fcd34d', // Amber-300
         }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Outfit', 'sans-serif'],
+        display: ['Cinzel', 'serif'],
+        tech: ['Rajdhani', 'sans-serif'],
       },
     },
   },

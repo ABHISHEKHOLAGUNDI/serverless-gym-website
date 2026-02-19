@@ -30,30 +30,31 @@ const Layout = () => {
     ];
 
     return (
-        <div className="flex flex-col min-h-screen bg-background text-text-primary font-sans">
+        <div className="flex flex-col min-h-screen bg-transparent text-text-primary font-sans relative">
+            {/* Alert Banner */}
             {dbError && (
-                <div className="bg-red-600 text-white text-center py-2 px-4 shadow-md z-[60] font-bold">
-                    ⚠️ {dbError} - Check Cloudflare Bindings!
+                <div className="bg-red-900/90 border-b border-red-500 text-white text-center py-2 px-4 shadow-[0_0_20px_rgba(220,38,38,0.5)] z-[60] font-bold animate-pulse font-tech tracking-wider">
+                    ⚠️ {dbError} - CHECK CONFIG
                 </div>
             )}
 
             {/* Top Header */}
-            <header className="fixed top-0 left-0 right-0 bg-white/70 backdrop-blur-lg border-b border-white/50 px-5 py-3 flex items-center justify-between z-50 shadow-sm">
+            <header className="fixed top-0 left-0 right-0 bg-[#050816]/80 backdrop-blur-md border-b border-gold-400/30 px-5 py-3 flex items-center justify-between z-50 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
                 <div className="flex items-center space-x-3">
-                    <button onClick={toggleSidebar} className="p-2 bg-white/50 hover:bg-white rounded-full transition-all shadow-sm border border-gray-100/50 text-gray-700">
+                    <button onClick={toggleSidebar} className="p-2 text-gold-400 hover:text-white hover:bg-gold-400/10 rounded-full transition-all border border-gold-400/20">
                         <Menu size={22} />
                     </button>
-                    <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                        Gym<span className="font-extrabold">Manager</span>
+                    <span className="text-2xl font-display font-bold bg-gradient-to-r from-gold-400 via-yellow-200 to-gold-600 bg-clip-text text-transparent tracking-widest drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+                        PARSEC<span className="text-white text-base font-tech tracking-normal ml-2 opacity-80">GYM</span>
                     </span>
                 </div>
-                <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full text-white shadow-md shadow-blue-500/30">
+                <div className="flex items-center justify-center w-10 h-10 border border-gold-400/50 rounded-full text-gold-400 shadow-[0_0_10px_rgba(251,191,36,0.3)] bg-black/40">
                     <Users size={18} />
                 </div>
             </header>
 
             {/* Main Content Area */}
-            <main className="flex-grow pt-16 p-4 overflow-y-auto bg-background">
+            <main className="flex-grow pt-20 p-4 overflow-y-auto">
                 <Outlet />
             </main>
 
@@ -63,34 +64,36 @@ const Layout = () => {
                     <>
                         <motion.div
                             initial={{ opacity: 0 }}
-                            animate={{ opacity: 0.5 }}
+                            animate={{ opacity: 0.7 }}
                             exit={{ opacity: 0 }}
                             onClick={toggleSidebar}
-                            className="fixed inset-0 bg-black z-50"
+                            className="fixed inset-0 bg-[#02040a] z-50 backdrop-blur-sm"
                         />
                         <motion.div
                             initial={{ x: '-100%' }}
                             animate={{ x: 0 }}
                             exit={{ x: '-100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed top-0 left-0 bottom-0 w-64 bg-white z-50 shadow-xl overflow-y-auto"
+                            className="fixed top-0 left-0 bottom-0 w-72 bg-[#0a0d14]/95 border-r border-gold-400/30 z-50 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-y-auto"
                         >
-                            <div className="p-4 bg-primary-blue text-white flex justify-between items-center">
-                                <span className="font-bold text-lg">Menu</span>
-                                <button onClick={toggleSidebar}><X size={24} /></button>
+                            <div className="p-6 border-b border-gold-400/20 flex justify-between items-center bg-gradient-to-r from-gold-900/20 to-transparent">
+                                <span className="font-display font-bold text-xl text-gold-400 tracking-widest">MENU</span>
+                                <button onClick={toggleSidebar} className="text-gray-400 hover:text-white"><X size={24} /></button>
                             </div>
 
-                            <div className="py-2">
+                            <div className="py-4 space-y-1 px-2">
                                 {menuItems.map((item, index) => (
                                     <button
                                         key={index}
                                         onClick={() => handleNavigation(item.path)}
-                                        className={`w-full flex items-center space-x-3 px-6 py-4 text-lg font-medium transition-colors ${location.pathname === item.path
-                                            ? 'bg-blue-50 text-primary-blue border-r-4 border-primary-blue'
-                                            : 'text-text-secondary hover:bg-gray-50 hover:text-text-primary'
+                                        className={`w-full flex items-center space-x-4 px-6 py-4 text-lg font-tech tracking-wide transition-all duration-300 border-l-2 ${location.pathname === item.path
+                                            ? 'bg-gradient-to-r from-gold-400/20 to-transparent text-gold-400 border-gold-400 shadow-[inset_0_0_20px_rgba(251,191,36,0.1)]'
+                                            : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
                                             }`}
                                     >
-                                        {item.icon}
+                                        <div className={`${location.pathname === item.path ? 'drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]' : ''}`}>
+                                            {item.icon}
+                                        </div>
                                         <span>{item.label}</span>
                                     </button>
                                 ))}

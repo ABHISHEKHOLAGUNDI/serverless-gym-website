@@ -1,22 +1,34 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap');
 
 @theme {
   --font-sans: 'Outfit', system-ui, sans-serif;
+  --font-display: 'Cinzel', serif;
+  --font-tech: 'Rajdhani', sans-serif;
 
-  /* Modern Light Theme Palette */
-  --color-background: #f0f2f5;
-  --color-glass: rgba(255, 255, 255, 0.7);
-  --color-glass-border: rgba(255, 255, 255, 0.5);
+  /* Cosmic Gold Theme Palette */
+  --color-background: #050816;
+  /* Deep Space Blue/Black */
+  --color-surface: rgba(17, 24, 39, 0.7);
+  /* Dark Glass */
+  --color-surface-light: rgba(31, 41, 55, 0.7);
 
-  --color-primary-blue: #2563eb;
-  --color-accent-indigo: #4f46e5;
+  --color-primary-gold: #fbbf24;
+  /* Amber-400 */
+  --color-primary-gold-dim: #d97706;
+  /* Amber-600 */
 
-  --color-text-primary: #111827;
-  --color-text-secondary: #6b7280;
+  --color-text-primary: #f3f4f6;
+  /* Gray-100 */
+  --color-text-secondary: #9ca3af;
+  /* Gray-400 */
+  --color-text-gold: #fcd34d;
+  /* Amber-300 */
 
-  --shadow-glass: 0 4px 30px rgba(0, 0, 0, 0.1);
-  --shadow-neumorphic: 5px 5px 10px #d1d5db, -5px -5px 10px #ffffff;
+  --shadow-gold-glow: 0 0 15px rgba(251, 191, 36, 0.15);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  --border-gold-thin: 1px solid rgba(251, 191, 36, 0.3);
 }
 
 :root {
@@ -24,7 +36,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light;
+  color-scheme: dark;
   color: var(--color-text-primary);
   background-color: var(--color-background);
 
@@ -40,16 +52,15 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  /* Subtle mesh gradient background */
-  background: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
-    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
-    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
-  background-color: #f3f4f6;
-  /* Fallback */
+
+  /* Deep Space Background with Stars */
+  background-color: #050816;
   background-image:
-    radial-gradient(at 40% 20%, hsla(210, 100%, 93%, 1) 0px, transparent 50%),
-    radial-gradient(at 80% 0%, hsla(189, 100%, 96%, 1) 0px, transparent 50%),
-    radial-gradient(at 0% 50%, hsla(341, 100%, 96%, 1) 0px, transparent 50%);
+    radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 3px),
+    radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 2px),
+    radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 3px);
+  background-size: 550px 550px, 350px 350px, 250px 250px;
+  background-position: 0 0, 40px 60px, 130px 270px;
 
   color: var(--color-text-primary);
 }
@@ -65,21 +76,62 @@ body {
 
 /* Glassmorphism Utilities */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(251, 191, 36, 0.15);
+  /* Subtle Gold Border */
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.6) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 0 15px rgba(251, 191, 36, 0.05);
+  /* Slight gold glow */
+  transition: all 0.3s ease;
 }
 
-/* Smooth Scrolling */
+.glass-card:hover {
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Typography Overrides */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  color: var(--color-text-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #fbbf24;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d97706;
+}
+
 html {
   scroll-behavior: smooth;
 }
