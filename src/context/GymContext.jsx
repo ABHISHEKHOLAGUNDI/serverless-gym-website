@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const GymContext = createContext();
 
@@ -8,6 +9,7 @@ const INITIAL_TRAINERS = [];
 const INITIAL_MACHINES = [];
 
 export const GymProvider = ({ children }) => {
+    const { isAuthenticated } = useAuth();
     const [members, setMembers] = useState([]);
     const [transactions, setTransactions] = useState([]);
     const [trainers, setTrainers] = useState([]);
@@ -17,7 +19,13 @@ export const GymProvider = ({ children }) => {
 
     // Fetch Initial Data
     useEffect(() => {
+        if (!isAuthenticated) {
+            setLoading(false);
+            return;
+        }
+
         const fetchData = async () => {
+            setLoading(true); // Reset loading state when starting fetch
             try {
                 const endpoints = [
                     { key: 'members', url: '/api/members' },
@@ -63,7 +71,7 @@ export const GymProvider = ({ children }) => {
             }
         };
         fetchData();
-    }, []);
+    }, [isAuthenticated]);
 
     // Derived Stats
     const stats = {
