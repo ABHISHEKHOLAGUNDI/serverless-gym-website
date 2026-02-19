@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -16,21 +18,11 @@ const Login = () => {
         setError('');
 
         try {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pin: password })
-            });
-
-            if (res.ok) {
-                navigate('/dashboard');
-            } else {
-                const data = await res.json();
-                setError(data.error || 'Access Denied');
-                setPassword(''); // Clear pin on error
-            }
+            await login(password);
+            navigate('/dashboard');
         } catch (err) {
-            setError('Connection failed. Please try again.');
+            setError(err.message || 'Access Denied');
+            setPassword('');
         } finally {
             setLoading(false);
         }
