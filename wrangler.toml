@@ -5,4 +5,4 @@ compatibility_date = "2024-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "gym-db"
-database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" # Placeholder, will be replaced by real ID in production
+database_id = "378f922f-0a57-4547-97f3-b2f25f7f1173"
