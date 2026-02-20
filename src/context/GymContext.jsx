@@ -167,21 +167,31 @@ export const GymProvider = ({ children }) => {
         const oldMembers = [...members];
         setMembers(prev => prev.filter(m => m.id !== id));
         try {
-            await fetch(`/api/members?id=${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/members?id=${id}`, { method: 'DELETE' });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || 'Delete failed');
+            }
         } catch (err) {
             console.error("Delete member failed", err);
             setMembers(oldMembers); // Revert
+            alert("Failed to delete member: " + err.message);
         }
     };
 
     const renewMember = async (id, newExpiry, amount, planType) => {
+        const originalMembers = [...members];
         setMembers(prev => prev.map(m => m.id === id ? { ...m, expiry: newExpiry, status: 'Active', planType } : m));
         try {
-            await fetch('/api/members', {
+            const res = await fetch('/api/members', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, expiry: newExpiry, status: 'Active', planType, amount })
             });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || 'Renewal failed');
+            }
 
             if (amount) {
                 addTransaction({
@@ -194,6 +204,8 @@ export const GymProvider = ({ children }) => {
             }
         } catch (err) {
             console.error("Renew member failed", err);
+            setMembers(originalMembers); // Revert
+            alert("Failed to renew membership: " + err.message);
         }
     };
 
@@ -219,8 +231,17 @@ export const GymProvider = ({ children }) => {
     const deleteTransaction = async (id) => {
         const oldVals = [...transactions];
         setTransactions(prev => prev.filter(t => t.id !== id));
-        // Note: DELETE endpoint for finances not implemented in this scope, but logic is here.
-        // Assuming user might add it later or we just hide it locally.
+        try {
+            const res = await fetch(`/api/finances?id=${id}`, { method: 'DELETE' });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || 'Delete failed');
+            }
+        } catch (err) {
+            console.error("Delete transaction failed", err);
+            setTransactions(oldVals); // Revert
+            alert("Failed to delete transaction: " + err.message);
+        }
     };
 
     // Trainer Actions
@@ -228,20 +249,58 @@ export const GymProvider = ({ children }) => {
         const tempId = Date.now();
         setTrainers(prev => [...prev, { ...trainer, id: tempId }]);
         try {
-            const res = await fetch('/api/trainers', { method: 'POST', body: JSON.stringify(trainer) });
+            const res = await fetch('/api/trainers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(trainer)
+            });
             const data = await res.json();
-            if (res.ok) setTrainers(prev => prev.map(t => t.id === tempId ? { ...trainer, id: data.id } : t));
-        } catch (err) { console.error(err); }
+            if (res.ok) {
+                setTrainers(prev => prev.map(t => t.id === tempId ? { ...trainer, id: data.id } : t));
+            } else {
+                throw new Error(data.error || 'Add trainer failed');
+            }
+        } catch (err) {
+            console.error("Add trainer failed", err);
+            setTrainers(prev => prev.filter(t => t.id !== tempId)); // Revert
+            alert("Failed to add trainer: " + err.message);
+        }
     };
 
-    const updateTrainer = (updatedTrainer) => {
-        // Implement PUT if needed
+    const updateTrainer = async (updatedTrainer) => {
+        const originalTrainers = [...trainers];
         setTrainers(prev => prev.map(t => t.id === updatedTrainer.id ? updatedTrainer : t));
+        try {
+            const res = await fetch('/api/trainers', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedTrainer)
+            });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || 'Update failed');
+            }
+        } catch (err) {
+            console.error("Update trainer failed", err);
+            setTrainers(originalTrainers); // Revert
+            alert("Failed to update trainer: " + err.message);
+        }
     };
 
     const deleteTrainer = async (id) => {
+        const oldTrainers = [...trainers];
         setTrainers(prev => prev.filter(t => t.id !== id));
-        try { await fetch(`/api/trainers?id=${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try {
+            const res = await fetch(`/api/trainers?id=${id}`, { method: 'DELETE' });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || 'Delete failed');
+            }
+        } catch (err) {
+            console.error("Delete trainer failed", err);
+            setTrainers(oldTrainers); // Revert
+            alert("Failed to delete trainer: " + err.message);
+        }
     };
 
     // Machine Actions
@@ -249,19 +308,58 @@ export const GymProvider = ({ children }) => {
         const tempId = Date.now();
         setMachines(prev => [...prev, { ...machine, id: tempId }]);
         try {
-            const res = await fetch('/api/machines', { method: 'POST', body: JSON.stringify(machine) });
+            const res = await fetch('/api/machines', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(machine)
+            });
             const data = await res.json();
-            if (res.ok) setMachines(prev => prev.map(m => m.id === tempId ? { ...machine, id: data.id } : m));
-        } catch (err) { console.error(err); }
+            if (res.ok) {
+                setMachines(prev => prev.map(m => m.id === tempId ? { ...machine, id: data.id } : m));
+            } else {
+                throw new Error(data.error || 'Add machine failed');
+            }
+        } catch (err) {
+            console.error("Add machine failed", err);
+            setMachines(prev => prev.filter(m => m.id !== tempId)); // Revert
+            alert("Failed to add machine: " + err.message);
+        }
     };
 
-    const updateMachine = (updatedMachine) => {
+    const updateMachine = async (updatedMachine) => {
+        const originalMachines = [...machines];
         setMachines(prev => prev.map(m => m.id === updatedMachine.id ? updatedMachine : m));
+        try {
+            const res = await fetch('/api/machines', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedMachine)
+            });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || 'Update failed');
+            }
+        } catch (err) {
+            console.error("Update machine failed", err);
+            setMachines(originalMachines); // Revert
+            alert("Failed to update machine: " + err.message);
+        }
     };
 
     const deleteMachine = async (id) => {
+        const oldMachines = [...machines];
         setMachines(prev => prev.filter(m => m.id !== id));
-        try { await fetch(`/api/machines?id=${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try {
+            const res = await fetch(`/api/machines?id=${id}`, { method: 'DELETE' });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || 'Delete failed');
+            }
+        } catch (err) {
+            console.error("Delete machine failed", err);
+            setMachines(oldMachines); // Revert
+            alert("Failed to delete machine: " + err.message);
+        }
     };
 
     return (

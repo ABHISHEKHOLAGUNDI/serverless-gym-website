@@ -24,3 +24,18 @@ export async function onRequestPost(context) {
         return Response.json({ error: e.message }, { status: 500 });
     }
 }
+
+export async function onRequestDelete(context) {
+    const { request, env } = context;
+    const url = new URL(request.url);
+    const id = url.searchParams.get('id');
+
+    if (!id) return Response.json({ error: "Missing ID" }, { status: 400 });
+
+    try {
+        await env.DB.prepare("DELETE FROM finances WHERE id = ?").bind(id).run();
+        return Response.json({ message: "Transaction deleted" });
+    } catch (e) {
+        return Response.json({ error: e.message }, { status: 500 });
+    }
+}

@@ -31,6 +31,27 @@ export async function onRequestPost(context) {
     }
 }
 
+export async function onRequestPut(context) {
+    const { request, env } = context;
+    try {
+        const { id, name, status, lastMaintenance, nextMaintenance } = await request.json();
+        if (!id) return Response.json({ error: "Missing ID" }, { status: 400 });
+
+        await env.DB.prepare(
+            `UPDATE machines SET 
+                name = COALESCE(?, name), 
+                status = COALESCE(?, status), 
+                last_maintenance = COALESCE(?, last_maintenance), 
+                next_maintenance = COALESCE(?, next_maintenance) 
+            WHERE id = ?`
+        ).bind(name || null, status || null, lastMaintenance || null, nextMaintenance || null, id).run();
+
+        return Response.json({ message: "Machine updated" });
+    } catch (e) {
+        return Response.json({ error: e.message }, { status: 500 });
+    }
+}
+
 export async function onRequestDelete(context) {
     const { request, env } = context;
     const url = new URL(request.url);

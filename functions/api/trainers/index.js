@@ -23,6 +23,26 @@ export async function onRequestPost(context) {
     }
 }
 
+export async function onRequestPut(context) {
+    const { request, env } = context;
+    try {
+        const { id, name, specialty, phone } = await request.json();
+        if (!id) return Response.json({ error: "Missing ID" }, { status: 400 });
+
+        await env.DB.prepare(
+            `UPDATE trainers SET 
+                name = COALESCE(?, name), 
+                specialty = COALESCE(?, specialty), 
+                phone = COALESCE(?, phone) 
+            WHERE id = ?`
+        ).bind(name || null, specialty || null, phone || null, id).run();
+
+        return Response.json({ message: "Trainer updated" });
+    } catch (e) {
+        return Response.json({ error: e.message }, { status: 500 });
+    }
+}
+
 export async function onRequestDelete(context) {
     const { request, env } = context;
     const url = new URL(request.url);
