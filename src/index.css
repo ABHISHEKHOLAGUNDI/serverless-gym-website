@@ -242,7 +242,6 @@ body {
 
 /* Premium Glass Modal */
 .glass-modal {
-  position: relative;
   z-index: 50;
   max-height: 88vh;
   overflow-y: auto;
@@ -258,6 +257,21 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
   width: 100%;
   max-width: 420px;
+}
+
+/* Dropdown menu (used inside member cards) */
+.glass-dropdown {
+  position: absolute;
+  z-index: 50;
+  background: linear-gradient(170deg, rgba(15, 23, 42, 0.98) 0%, rgba(8, 13, 26, 0.99) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 16px;
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(251, 191, 36, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 @media (min-width: 768px) {

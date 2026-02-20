@@ -319,8 +319,12 @@ const Members = () => {
                     onClick={() => handleOpenModal(false)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-1.5 bg-gradient-to-br from-gold-400 to-gold-600 text-black px-4 py-2.5 rounded-xl relative overflow-hidden shimmer-hover font-tech font-bold tracking-wider text-sm"
-                    style={{ boxShadow: '0 0 22px rgba(251, 191, 36, 0.4), 0 4px 15px rgba(0, 0, 0, 0.5)' }}
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl relative overflow-hidden font-tech font-bold tracking-wider text-sm text-gold-400"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(217, 119, 6, 0.1))',
+                        border: '1px solid rgba(251, 191, 36, 0.5)',
+                        boxShadow: '0 0 20px rgba(251, 191, 36, 0.2), 0 0 40px rgba(251, 191, 36, 0.08), inset 0 1px 0 rgba(255,255,255,0.05)'
+                    }}
                 >
                     <Plus size={18} strokeWidth={2.5} />
                     ADD
@@ -452,7 +456,7 @@ const Members = () => {
                                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                                 exit={{ opacity: 0, scale: 0.95, y: -5 }}
                                                 transition={{ duration: 0.15 }}
-                                                className="absolute right-0 top-11 w-48 glass-modal rounded-xl z-50 overflow-hidden py-1"
+                                                className="right-0 top-11 w-48 glass-dropdown rounded-xl overflow-hidden py-1"
                                             >
                                                 {[
                                                     { label: 'Invoice', icon: <Download size={14} />, color: 'text-blue-400', bg: 'bg-blue-500/10', action: () => generateInvoice({ ...member, amount: '0.00' }) },
