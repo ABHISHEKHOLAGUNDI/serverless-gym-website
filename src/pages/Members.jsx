@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Phone, MoreVertical, Edit, Trash, Download, RefreshCw, X, MessageCircle, Cake } from 'lucide-react'; // Added MessageCircle, Cake
+import { Search, Plus, Phone, MoreVertical, Edit, Trash, Download, RefreshCw, X, MessageCircle, Cake, Users } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { useGymContext } from '../context/GymContext';
 import { useLocation } from 'react-router-dom';
@@ -297,39 +297,43 @@ const Members = () => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="pb-24 px-4 space-y-6 pt-4 relative min-h-screen"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="pb-24 px-3 space-y-4 pt-3 relative min-h-screen"
         >
             {/* Header */}
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase">Members</h1>
-                    <p className="text-sm text-gray-500 font-tech">
+                    <div className="flex items-center gap-2">
+                        <h1 className="page-title">Members</h1>
+                        {filterParam && (
+                            <button onClick={() => window.history.back()} className="text-[10px] bg-gold-500/10 border border-gold-400/20 px-2.5 py-0.5 rounded-full text-gold-400 font-tech tracking-wider hover:bg-gold-500/20 transition-colors">✕ Filter</button>
+                        )}
+                    </div>
+                    <p className="page-subtitle">
                         {filterParam === 'expired' ? 'Expired Members' : filterParam === 'expiring_soon' ? 'Expiring Soon (1-3 Days)' : 'Manage your gym members'}
                     </p>
+                    <div className="accent-line"></div>
                 </div>
-                {filterParam && (
-                    <button onClick={() => window.history.back()} className="text-xs bg-gold-500/10 border border-gold-400/20 px-3 py-1 rounded-full text-gold-400 font-tech">Close Filter</button>
-                )}
-                <button
+                <motion.button
                     onClick={() => handleOpenModal(false)}
-                    className="bg-gradient-to-r from-gold-500 to-amber-600 text-black p-3 rounded-full shadow-lg shadow-gold-500/20 transition-all transform hover:scale-105 active:scale-95"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-gradient-to-br from-gold-400 to-gold-600 text-black p-2.5 rounded-xl shadow-[0_4px_15px_rgba(251,191,36,0.2)] relative overflow-hidden shimmer-hover"
                 >
-                    <Plus size={24} />
-                </button>
+                    <Plus size={20} strokeWidth={2.5} />
+                </motion.button>
             </div>
 
             {/* Search Bar */}
             <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="text-gray-600 group-focus-within:text-gold-400 transition-colors" size={20} />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Search className="text-gray-600 group-focus-within:text-gold-400 transition-colors duration-300" size={18} />
                 </div>
                 <input
                     type="text"
-                    placeholder="Search members..."
-                    className="block w-full pl-10 pr-3 py-3 bg-[#0c1220]/70 border border-gold-400/20 rounded-xl text-white placeholder-gray-700 focus:outline-none focus:border-gold-400 transition-all font-tech"
+                    placeholder="Search by name or phone..."
+                    className="cosmic-input pl-10"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -352,34 +356,37 @@ const Members = () => {
                         return (
                             <motion.div
                                 key={member.id}
-                                initial={{ opacity: 0, y: 10 }}
+                                initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.25 }}
                                 style={{ zIndex: activeMenuId === member.id ? 20 : 0 }}
-                                className={`p-4 rounded-xl flex justify-between items-center border transition-all relative ${isExpired
-                                    ? 'bg-red-950/30 border-red-500/20'
-                                    : 'bg-[#0c1220]/70 border-gold-400/10 hover:border-gold-400/30'
+                                className={`p-3.5 rounded-xl flex justify-between items-center border transition-all duration-300 relative ${isExpired
+                                        ? 'bg-red-950/20 border-red-500/15 status-expired'
+                                        : isExpiringSoon
+                                            ? 'bg-amber-950/10 border-amber-500/15 status-warning'
+                                            : 'bg-[#0a0f1a]/60 border-white/[0.04] hover:border-gold-400/20 status-active'
                                     }`}
                             >
-                                <div className="flex items-center space-x-4">
+                                <div className="flex items-center gap-3">
                                     {member.photo ? (
-                                        <img src={member.photo} alt={member.name} className="w-12 h-12 rounded-full object-cover border-2 border-gold-400/30 shadow-md" />
+                                        <img src={member.photo} alt={member.name} className="w-11 h-11 rounded-xl object-cover border border-gold-400/20 shadow-md" />
                                     ) : (
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white font-display border ${isExpired ? 'bg-red-900/50 border-red-500/30' :
-                                            isExpiringSoon ? 'bg-amber-900/50 border-amber-500/30' :
-                                                'bg-emerald-900/50 border-emerald-500/30'
+                                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm font-display border ${isExpired ? 'bg-red-500/10 border-red-500/20 text-red-400' :
+                                                isExpiringSoon ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
+                                                    'bg-emerald-500/8 border-emerald-500/15 text-emerald-400'
                                             }`}>
                                             {member.name.charAt(0)}
                                         </div>
                                     )}
-                                    <div>
-                                        <h3 className="font-tech font-bold text-white text-base tracking-wider">{member.name}</h3>
-                                        <div className="flex flex-col">
-                                            <span className={`text-xs font-tech ${isExpired ? 'text-red-400 font-bold' : 'text-gray-500'}`}>
-                                                Exp: {formatDate(member.expiry)}
+                                    <div className="min-w-0">
+                                        <h3 className="font-tech font-semibold text-white text-sm tracking-wider truncate">{member.name}</h3>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            <span className={`text-[11px] font-tech ${isExpired ? 'text-red-400' : 'text-gray-600'}`}>
+                                                {formatDate(member.expiry)}
                                             </span>
-                                            <span className={`text-[10px] uppercase font-bold tracking-widest mt-0.5 ${isExpired ? 'text-red-500' :
-                                                isExpiringSoon ? 'text-amber-400' :
-                                                    'text-emerald-400'
+                                            <span className={`text-[9px] uppercase font-bold tracking-[0.12em] px-1.5 py-0.5 rounded-md ${isExpired ? 'text-red-400 bg-red-500/10' :
+                                                    isExpiringSoon ? 'text-amber-400 bg-amber-500/10' :
+                                                        'text-emerald-400 bg-emerald-500/8'
                                                 }`}>
                                                 {isExpired ? 'EXPIRED' : member.status}
                                             </span>
@@ -387,43 +394,43 @@ const Members = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex space-x-2 items-center relative">
+                                <div className="flex gap-1.5 items-center relative">
                                     {isExpiringSoon && (
                                         <button
                                             onClick={() => sendExpiryReminder(member)}
-                                            className="p-2 bg-amber-900/30 text-amber-400 rounded-full hover:bg-amber-900/50 border border-amber-500/20 transition-colors animate-pulse"
+                                            className="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20 border border-amber-500/15 transition-all"
                                             title="Send Expiry Reminder"
                                         >
-                                            <MessageCircle size={18} />
+                                            <MessageCircle size={16} />
                                         </button>
                                     )}
 
                                     {isBirthday && (
                                         <button
                                             onClick={() => sendBirthdayWish(member)}
-                                            className="p-2 bg-pink-900/30 text-pink-400 rounded-full hover:bg-pink-900/50 border border-pink-500/20 transition-colors animate-bounce"
+                                            className="p-1.5 bg-pink-500/10 text-pink-400 rounded-lg hover:bg-pink-500/20 border border-pink-500/15 transition-all"
                                             title="Send Birthday Wish"
                                         >
-                                            <Cake size={18} />
+                                            <Cake size={16} />
                                         </button>
                                     )}
 
                                     {isExpired && (
                                         <button
                                             onClick={() => handleOpenModal('renew', member)}
-                                            className="p-2 bg-emerald-900/30 text-emerald-400 rounded-full hover:bg-emerald-900/50 border border-emerald-500/20 transition-colors"
+                                            className="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg hover:bg-emerald-500/20 border border-emerald-500/15 transition-all"
                                             title="Renew Now"
                                         >
-                                            <RefreshCw size={18} />
+                                            <RefreshCw size={16} />
                                         </button>
                                     )}
 
                                     {!isExpired && !isExpiringSoon && (
                                         <a
                                             href={`tel:${member.phone}`}
-                                            className="p-2 bg-emerald-900/30 text-emerald-400 rounded-full hover:bg-emerald-900/50 border border-emerald-500/20 transition-colors"
+                                            className="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg hover:bg-emerald-500/20 border border-emerald-500/15 transition-all"
                                         >
-                                            <Phone size={18} />
+                                            <Phone size={16} />
                                         </a>
                                     )}
 
@@ -432,30 +439,33 @@ const Members = () => {
                                             e.stopPropagation();
                                             setActiveMenuId(activeMenuId === member.id ? null : member.id);
                                         }}
-                                        className="p-2 bg-white/5 text-gray-500 rounded-full hover:bg-white/10 border border-white/5 transition-colors"
+                                        className="p-1.5 bg-white/[0.03] text-gray-600 rounded-lg hover:bg-white/[0.06] hover:text-gray-400 border border-white/[0.04] transition-all"
                                     >
-                                        <MoreVertical size={18} />
+                                        <MoreVertical size={16} />
                                     </button>
                                     <AnimatePresence>
                                         {activeMenuId === member.id && (
                                             <motion.div
-                                                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                                                initial={{ opacity: 0, scale: 0.95, y: -5 }}
                                                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                                className="absolute right-0 top-12 w-52 bg-[#0a0d14] rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-gold-400/20 z-50 overflow-hidden"
+                                                exit={{ opacity: 0, scale: 0.95, y: -5 }}
+                                                transition={{ duration: 0.15 }}
+                                                className="absolute right-0 top-11 w-48 glass-modal rounded-xl z-50 overflow-hidden py-1"
                                             >
-                                                <button onClick={() => generateInvoice({ ...member, amount: '0.00' })} className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-gold-400 flex items-center gap-3 font-tech tracking-wider transition-all">
-                                                    <Download size={15} className="text-blue-400" /> Invoice
-                                                </button>
-                                                <button onClick={() => handleOpenModal('edit', member)} className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-gold-400 flex items-center gap-3 font-tech tracking-wider transition-all">
-                                                    <Edit size={15} className="text-amber-400" /> Edit Details
-                                                </button>
-                                                <button onClick={() => handleOpenModal('renew', member)} className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-gold-400 flex items-center gap-3 font-tech tracking-wider transition-all">
-                                                    <RefreshCw size={15} className="text-emerald-400" /> Renew
-                                                </button>
-                                                <div className="h-px bg-gold-400/10 my-1"></div>
-                                                <button onClick={() => handleDelete(member.id)} className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-900/20 flex items-center gap-3 font-tech tracking-wider transition-all">
-                                                    <Trash size={15} /> Delete
+                                                {[
+                                                    { label: 'Invoice', icon: <Download size={14} />, color: 'text-blue-400', bg: 'bg-blue-500/10', action: () => generateInvoice({ ...member, amount: '0.00' }) },
+                                                    { label: 'Edit', icon: <Edit size={14} />, color: 'text-amber-400', bg: 'bg-amber-500/10', action: () => handleOpenModal('edit', member) },
+                                                    { label: 'Renew', icon: <RefreshCw size={14} />, color: 'text-emerald-400', bg: 'bg-emerald-500/10', action: () => handleOpenModal('renew', member) },
+                                                ].map((item, i) => (
+                                                    <button key={i} onClick={item.action} className="w-full text-left px-3 py-2.5 text-[13px] text-gray-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-2.5 font-tech tracking-wider transition-all">
+                                                        <div className={`w-7 h-7 rounded-lg ${item.bg} ${item.color} flex items-center justify-center`}>{item.icon}</div>
+                                                        {item.label}
+                                                    </button>
+                                                ))}
+                                                <div className="h-px bg-white/[0.05] my-1 mx-3"></div>
+                                                <button onClick={() => handleDelete(member.id)} className="w-full text-left px-3 py-2.5 text-[13px] text-red-400 hover:bg-red-500/10 flex items-center gap-2.5 font-tech tracking-wider transition-all">
+                                                    <div className="w-7 h-7 rounded-lg bg-red-500/10 flex items-center justify-center"><Trash size={14} /></div>
+                                                    Delete
                                                 </button>
                                             </motion.div>
                                         )}
@@ -465,8 +475,12 @@ const Members = () => {
                         );
                     })
                 ) : (
-                    <div className="text-center py-10 text-gray-600">
-                        <p className="font-tech tracking-wider">No members found</p>
+                    <div className="empty-state">
+                        <div className="empty-state-icon">
+                            <Users size={28} className="text-gold-400/40" />
+                        </div>
+                        <p className="empty-state-title">No members found</p>
+                        <p className="empty-state-sub">Add your first member to get started</p>
                     </div>
                 )}
             </div>
@@ -474,20 +488,24 @@ const Members = () => {
             {/* Add/Edit/Renew Modal */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#02040a]/80 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020408]/85 backdrop-blur-md">
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-[#0a0d14] border border-gold-400/30 rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-[0_0_60px_rgba(0,0,0,0.8)]"
+                            initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.95, opacity: 0, y: 10 }}
+                            transition={{ duration: 0.2 }}
+                            className="glass-modal rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
                         >
-                            <div className="p-6 space-y-4">
-                                <div className="flex justify-between items-center border-b border-gold-400/10 pb-4">
-                                    <h2 className="text-xl font-display font-bold text-gold-400 tracking-widest uppercase">
-                                        {editMode === 'edit' ? 'Edit Member' : editMode === 'renew' ? 'Renew Membership' : 'Add New Member'}
-                                    </h2>
-                                    <button onClick={() => setIsModalOpen(false)} className="p-2 bg-white/5 rounded-full hover:bg-white/10 border border-white/5">
-                                        <X size={20} className="text-gray-400" />
+                            <div className="p-5 space-y-4">
+                                <div className="flex justify-between items-center pb-3 border-b border-white/[0.05]">
+                                    <div>
+                                        <h2 className="text-lg font-display font-bold text-gold-400 tracking-[0.1em] uppercase">
+                                            {editMode === 'edit' ? 'Edit Member' : editMode === 'renew' ? 'Renew' : 'New Member'}
+                                        </h2>
+                                        <div className="accent-line mt-1"></div>
+                                    </div>
+                                    <button onClick={() => setIsModalOpen(false)} className="p-1.5 bg-white/[0.03] rounded-lg hover:bg-white/[0.06] border border-white/[0.04] transition-all">
+                                        <X size={18} className="text-gray-500" />
                                     </button>
                                 </div>
 
@@ -520,7 +538,7 @@ const Members = () => {
                                         required
                                         type="text"
                                         placeholder="Full Name"
-                                        className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all disabled:opacity-50"
+                                        className="cosmic-input"
                                         value={newMember.name}
                                         onChange={e => setNewMember({ ...newMember, name: e.target.value })}
                                         disabled={editMode === 'renew'}
@@ -528,23 +546,23 @@ const Members = () => {
 
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="flex flex-col gap-1">
-                                            <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Phone Number</label>
+                                            <label className="cosmic-label">Phone</label>
                                             <input
                                                 required
                                                 type="tel"
                                                 placeholder="Phone Number"
-                                                className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all disabled:opacity-50"
+                                                className="cosmic-input"
                                                 value={newMember.phone}
                                                 onChange={e => setNewMember({ ...newMember, phone: e.target.value })}
                                                 disabled={editMode === 'renew'}
                                             />
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Height (cm)</label>
+                                            <label className="cosmic-label">Height (cm)</label>
                                             <input
                                                 type="number"
-                                                placeholder="Height (cm)"
-                                                className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all"
+                                                placeholder="Height"
+                                                className="cosmic-input"
                                                 value={newMember.height}
                                                 onChange={e => setNewMember({ ...newMember, height: e.target.value })}
                                             />
@@ -552,10 +570,10 @@ const Members = () => {
                                     </div>
 
                                     <div className="flex flex-col gap-1">
-                                        <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Date of Birth</label>
+                                        <label className="cosmic-label">Date of Birth</label>
                                         <input
                                             type="date"
-                                            className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all"
+                                            className="cosmic-input"
                                             value={newMember.dob}
                                             onChange={e => setNewMember({ ...newMember, dob: e.target.value })}
                                         />
@@ -563,16 +581,16 @@ const Members = () => {
 
                                     {/* Plan Type Tabs */}
                                     <div className="space-y-1">
-                                        <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Plan Type</label>
-                                        <div className="flex bg-[#050816]/80 border border-gold-400/15 p-1 rounded-xl">
+                                        <label className="cosmic-label">Plan Type</label>
+                                        <div className="flex bg-[#050816]/60 border border-white/[0.04] p-1 rounded-xl gap-1">
                                             {['Monthly', 'Quarterly', 'Yearly'].map((plan) => (
                                                 <button
                                                     type="button"
                                                     key={plan}
                                                     onClick={() => setNewMember({ ...newMember, planType: plan })}
-                                                    className={`flex-1 py-2 rounded-lg text-sm font-tech font-medium tracking-wider transition-all ${newMember.planType === plan
-                                                        ? 'bg-gradient-to-r from-gold-500 to-amber-600 text-black shadow-sm'
-                                                        : 'text-gray-600 hover:text-gray-400'
+                                                    className={`flex-1 py-2 rounded-lg text-sm font-tech font-semibold tracking-wider transition-all duration-200 ${newMember.planType === plan
+                                                        ? 'bg-gradient-to-r from-gold-400 to-gold-600 text-black shadow-[0_2px_8px_rgba(251,191,36,0.2)]'
+                                                        : 'text-gray-600 hover:text-gray-400 hover:bg-white/[0.03]'
                                                         }`}
                                                 >
                                                     {plan}
@@ -581,39 +599,42 @@ const Members = () => {
                                         </div>
                                     </div>
 
-                                    <input
-                                        type="number"
-                                        placeholder="Amount (₹)"
-                                        className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all"
-                                        value={newMember.amount}
-                                        onChange={e => setNewMember({ ...newMember, amount: e.target.value })}
-                                    />
+                                    <div className="flex flex-col gap-1">
+                                        <label className="cosmic-label">Amount</label>
+                                        <input
+                                            type="number"
+                                            placeholder="₹ 0.00"
+                                            className="cosmic-input"
+                                            value={newMember.amount}
+                                            onChange={e => setNewMember({ ...newMember, amount: e.target.value })}
+                                        />
+                                    </div>
 
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="flex flex-col gap-1">
-                                            <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Start Date</label>
+                                            <label className="cosmic-label">Start Date</label>
                                             <input
                                                 type="date"
-                                                className="p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all"
+                                                className="cosmic-input"
                                                 value={newMember.startDate}
                                                 onChange={e => setNewMember({ ...newMember, startDate: e.target.value })}
                                             />
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">End Date (Auto)</label>
+                                            <label className="cosmic-label">End Date (Auto)</label>
                                             <input
                                                 type="date"
                                                 disabled
-                                                className="p-3 bg-[#050816]/60 border border-white/5 text-gray-600 rounded-xl outline-none font-tech"
+                                                className="cosmic-input"
                                                 value={newMember.endDate}
                                             />
                                         </div>
                                     </div>
 
                                     <div className="flex flex-col gap-1">
-                                        <label className="text-xs text-gray-500 ml-1 font-tech uppercase tracking-widest">Assign Trainer</label>
+                                        <label className="cosmic-label">Assign Trainer</label>
                                         <select
-                                            className="w-full p-3 bg-[#050816]/80 border border-gold-400/20 focus:border-gold-400 rounded-xl outline-none text-white font-tech transition-all appearance-none"
+                                            className="cosmic-input appearance-none"
                                             value={newMember.trainerId || ''}
                                             onChange={e => setNewMember({ ...newMember, trainerId: parseInt(e.target.value) })}
                                         >
@@ -624,19 +645,19 @@ const Members = () => {
                                         </select>
                                     </div>
 
-                                    <div className="flex gap-4 pt-4">
+                                    <div className="flex gap-3 pt-3">
                                         <button
                                             type="button"
                                             onClick={() => setIsModalOpen(false)}
-                                            className="flex-1 py-3 text-gray-500 font-tech font-bold bg-white/5 border border-white/5 rounded-xl tracking-wider hover:bg-white/10 transition-colors"
+                                            className="cosmic-btn-ghost flex-1"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
-                                            className="flex-1 py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-black font-bold font-tech rounded-xl shadow-lg shadow-gold-500/10 tracking-wider hover:opacity-90"
+                                            className="cosmic-btn flex-1"
                                         >
-                                            {editMode === 'add' ? 'Add Member' : editMode === 'renew' ? 'Renew Membership' : 'Save Changes'}
+                                            {editMode === 'add' ? 'Add Member' : editMode === 'renew' ? 'Renew' : 'Save'}
                                         </button>
                                     </div>
                                 </form>

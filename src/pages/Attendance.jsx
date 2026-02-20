@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar as CalendarIcon, Search, UserCheck, UserX } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, UserCheck, UserX, Users } from 'lucide-react';
 
 const Attendance = () => {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -49,6 +49,7 @@ const Attendance = () => {
         record.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     const presentCount = attendanceData.filter(r => r.status === 'present').length;
+    const absentCount = attendanceData.filter(r => r.status !== 'present').length;
     const totalCount = attendanceData.length;
     const percentage = totalCount > 0 ? Math.round((presentCount / totalCount) * 100) : 0;
 
@@ -63,19 +64,32 @@ const Attendance = () => {
             <div className="flex justify-between items-end">
                 <div>
                     <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase">Attendance</h1>
-                    <p className="text-sm text-gray-500 font-tech mt-0.5">
+                    <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1"></div>
+                    <p className="text-sm text-gray-500 font-tech mt-1.5">
                         {new Date(date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                 </div>
-                <div className="flex flex-col items-end">
-                    <span className="text-xs font-tech text-gray-600 uppercase tracking-widest">Present</span>
-                    <span className="text-2xl font-display font-black text-gold-400">{presentCount}/{totalCount}</span>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-3 gap-3">
+                <div className="glass-card p-3 text-center border-l-2 border-l-emerald-500/50">
+                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">Present</p>
+                    <p className="text-xl font-display font-black text-emerald-400">{presentCount}</p>
+                </div>
+                <div className="glass-card p-3 text-center border-l-2 border-l-red-500/50">
+                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">Absent</p>
+                    <p className="text-xl font-display font-black text-red-400">{absentCount}</p>
+                </div>
+                <div className="glass-card p-3 text-center border-l-2 border-l-gold-500/50">
+                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">Rate</p>
+                    <p className="text-xl font-display font-black text-gold-400">{percentage}%</p>
                 </div>
             </div>
 
             {/* Date Picker + Circle Stats */}
-            <div className="bg-[#0c1220]/70 border border-gold-400/15 p-4 rounded-xl flex justify-between items-center">
-                <div className="flex items-center gap-3 bg-[#050816]/60 border border-gold-400/10 px-4 py-2 rounded-xl flex-1 mr-4">
+            <div className="glass-card p-4 flex justify-between items-center">
+                <div className="flex items-center gap-3 bg-[#050816]/60 border border-gold-400/10 px-4 py-2.5 rounded-xl flex-1 mr-4">
                     <CalendarIcon size={18} className="text-gold-500" />
                     <input
                         type="date"
@@ -86,10 +100,16 @@ const Attendance = () => {
                 </div>
                 <div className="w-16 h-16 relative flex items-center justify-center">
                     <svg className="w-full h-full transform -rotate-90">
-                        <circle cx="32" cy="32" r="28" stroke="#1a1f2e" strokeWidth="6" fill="transparent" />
-                        <circle cx="32" cy="32" r="28" stroke="#b8972a" strokeWidth="6" fill="transparent"
+                        <circle cx="32" cy="32" r="28" stroke="#1a1f2e" strokeWidth="5" fill="transparent" />
+                        <circle cx="32" cy="32" r="28" stroke="url(#goldGrad)" strokeWidth="5" fill="transparent"
                             strokeDasharray={175.9} strokeDashoffset={175.9 - (175.9 * percentage) / 100}
-                            strokeLinecap="round" />
+                            strokeLinecap="round" className="transition-all duration-700" />
+                        <defs>
+                            <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stopColor="#b8972a" />
+                                <stop offset="100%" stopColor="#d4a935" />
+                            </linearGradient>
+                        </defs>
                     </svg>
                     <span className="absolute text-xs font-bold text-gold-400 font-tech">{percentage}%</span>
                 </div>
@@ -97,13 +117,13 @@ const Attendance = () => {
 
             {/* Search */}
             <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="text-gray-600 group-focus-within:text-gold-400 transition-colors" size={20} />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Search className="text-gray-600 group-focus-within:text-gold-400 transition-colors" size={18} />
                 </div>
                 <input
                     type="text"
                     placeholder="Search member..."
-                    className="block w-full pl-10 pr-3 py-3 bg-[#0c1220]/70 border border-gold-400/20 rounded-xl text-white placeholder-gray-700 focus:outline-none focus:border-gold-400 transition-all font-tech"
+                    className="cosmic-input pl-10"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -111,23 +131,29 @@ const Attendance = () => {
 
             {/* List */}
             {loading ? (
-                <div className="text-center py-10 text-gray-600 font-tech tracking-wider">Loading attendance...</div>
+                <div className="empty-state">
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>
+                        <Users className="w-10 h-10 text-gold-500/30" />
+                    </motion.div>
+                    <p className="text-gray-600 font-tech tracking-wider mt-3">Loading attendance...</p>
+                </div>
             ) : (
                 <div className="space-y-3">
-                    {filteredAttendance.map(record => (
+                    {filteredAttendance.map((record, index) => (
                         <motion.div
                             key={record.member_id}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className={`p-4 rounded-xl flex justify-between items-center border transition-all ${record.status === 'present'
-                                    ? 'bg-emerald-950/30 border-emerald-500/20'
-                                    : 'bg-[#0c1220]/50 border-white/5'
+                            transition={{ delay: index * 0.03 }}
+                            className={`glass-card p-4 flex justify-between items-center transition-all ${record.status === 'present'
+                                ? 'border-l-2 border-l-emerald-500/60'
+                                : 'border-l-2 border-l-red-500/30'
                                 }`}
                         >
                             <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold font-display border ${record.status === 'present'
-                                        ? 'bg-emerald-900/50 text-emerald-400 border-emerald-500/30'
-                                        : 'bg-white/5 text-gray-600 border-white/5'
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold font-display border ${record.status === 'present'
+                                    ? 'bg-emerald-900/40 text-emerald-400 border-emerald-500/25 shadow-[0_0_10px_rgba(16,185,129,0.1)]'
+                                    : 'bg-white/5 text-gray-600 border-white/5'
                                     }`}>
                                     {record.name?.charAt(0)}
                                 </div>
@@ -140,9 +166,9 @@ const Attendance = () => {
                             </div>
                             <button
                                 onClick={() => toggleStatus(record.member_id, record.status)}
-                                className={`p-2 rounded-xl transition-all border ${record.status === 'present'
-                                        ? 'bg-emerald-900/40 text-emerald-400 hover:bg-emerald-900/60 border-emerald-500/20'
-                                        : 'bg-red-950/30 text-red-500 hover:bg-red-950/50 border-red-500/15'
+                                className={`p-2.5 rounded-xl transition-all border ${record.status === 'present'
+                                    ? 'bg-emerald-900/40 text-emerald-400 hover:bg-emerald-900/60 border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.1)]'
+                                    : 'bg-red-950/30 text-red-500 hover:bg-red-950/50 border-red-500/15'
                                     }`}
                             >
                                 {record.status === 'present' ? <UserCheck size={20} /> : <UserX size={20} />}
@@ -150,8 +176,11 @@ const Attendance = () => {
                         </motion.div>
                     ))}
                     {filteredAttendance.length === 0 && (
-                        <div className="text-center py-10 opacity-50">
-                            <p className="text-gray-600 font-tech tracking-wider">No active members found</p>
+                        <div className="empty-state">
+                            <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity }}>
+                                <Users className="w-14 h-14 mx-auto mb-3 text-gold-500/30" />
+                            </motion.div>
+                            <p className="text-gray-500 font-tech tracking-wider">No active members found</p>
                         </div>
                     )}
                 </div>
