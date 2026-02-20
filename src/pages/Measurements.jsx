@@ -66,8 +66,8 @@ const Measurements = () => {
             className="pb-24 px-4 space-y-6 pt-4 relative min-h-screen"
         >
             <div>
-                <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase">Measurements</h1>
-                <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1"></div>
+                <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.25)' }}>Measurements</h1>
+                <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1" style={{ boxShadow: '0 0 8px rgba(251, 191, 36, 0.3)' }}></div>
             </div>
 
             {!selectedMember ? (
@@ -75,7 +75,7 @@ const Measurements = () => {
                 <div className="space-y-4">
                     <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <Search className="text-gray-600 group-focus-within:text-gold-400 transition-colors" size={18} />
+                            <Search className="text-gray-500 group-focus-within:text-gold-400 transition-colors" size={18} />
                         </div>
                         <input
                             type="text"
@@ -107,7 +107,7 @@ const Measurements = () => {
                         {filteredMembers.length === 0 && (
                             <div className="empty-state">
                                 <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                                    <Ruler className="w-14 h-14 mx-auto mb-3 text-gold-500/30" />
+                                    <Ruler className="w-14 h-14 mx-auto mb-3 text-gold-500/40" />
                                 </motion.div>
                                 <p className="text-gray-500 font-tech tracking-wider">No members found</p>
                             </div>
@@ -127,7 +127,7 @@ const Measurements = () => {
                                 </div>
                                 <div>
                                     <h2 className="text-lg font-display font-bold text-gold-400 tracking-wider">{selectedMember.name}</h2>
-                                    <p className="text-gray-500 text-xs font-tech">Height: {selectedMember.height || 'N/A'} cm</p>
+                                    <p className="text-gray-400 text-xs font-tech">Height: {selectedMember.height || 'N/A'} cm</p>
                                 </div>
                             </div>
                             <button
@@ -184,7 +184,7 @@ const Measurements = () => {
                                     </div>
 
                                     <div className="border-t border-gold-400/10 my-2"></div>
-                                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">Optional Measurements</p>
+                                    <p className="text-[10px] font-tech text-gray-500 uppercase tracking-widest">Optional Measurements</p>
                                     <div className="grid grid-cols-3 gap-3">
                                         {[
                                             { p: 'Waist', k: 'waist' },
@@ -214,7 +214,7 @@ const Measurements = () => {
                         {!selectedMember.measurements || selectedMember.measurements.length === 0 ? (
                             <div className="empty-state">
                                 <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                                    <Weight className="w-12 h-12 text-gold-500/30" />
+                                    <Weight className="w-12 h-12 text-gold-500/40" />
                                 </motion.div>
                                 <p className="text-gray-500 font-tech tracking-wider mt-2 text-sm">No measurements recorded yet</p>
                             </div>
@@ -235,22 +235,22 @@ const Measurements = () => {
                                     </div>
                                     <div className="grid grid-cols-4 gap-2 text-center">
                                         <div className="bg-[#050816]/60 border border-white/5 rounded-xl p-2">
-                                            <div className="text-[10px] text-gray-600 uppercase font-tech">Chest</div>
+                                            <div className="text-[10px] text-gray-500 uppercase font-tech">Chest</div>
                                             <div className="font-semibold text-sm text-gray-300">{entry.chest}"</div>
                                         </div>
                                         <div className="bg-[#050816]/60 border border-white/5 rounded-xl p-2">
-                                            <div className="text-[10px] text-gray-600 uppercase font-tech">Arms</div>
+                                            <div className="text-[10px] text-gray-500 uppercase font-tech">Arms</div>
                                             <div className="font-semibold text-sm text-gray-300">{entry.bicepsL}" / {entry.bicepsR}"</div>
                                         </div>
                                         {entry.waist && (
                                             <div className="bg-[#050816]/60 border border-white/5 rounded-xl p-2">
-                                                <div className="text-[10px] text-gray-600 uppercase font-tech">Waist</div>
+                                                <div className="text-[10px] text-gray-500 uppercase font-tech">Waist</div>
                                                 <div className="font-semibold text-sm text-gray-300">{entry.waist}"</div>
                                             </div>
                                         )}
                                         {entry.thigh && (
                                             <div className="bg-[#050816]/60 border border-white/5 rounded-xl p-2">
-                                                <div className="text-[10px] text-gray-600 uppercase font-tech">Thigh</div>
+                                                <div className="text-[10px] text-gray-500 uppercase font-tech">Thigh</div>
                                                 <div className="font-semibold text-sm text-gray-300">{entry.thigh}"</div>
                                             </div>
                                         )}

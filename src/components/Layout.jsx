@@ -40,25 +40,49 @@ const Layout = () => {
 
             {/* Top Header */}
             <header className="fixed top-0 left-0 right-0 z-50">
-                <div className="bg-[#050816]/85 backdrop-blur-xl px-5 py-3 flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
+                <div className="px-5 py-3 flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.6)]"
+                    style={{
+                        background: 'linear-gradient(180deg, rgba(8, 13, 26, 0.95) 0%, rgba(8, 13, 26, 0.85) 100%)',
+                        backdropFilter: 'blur(20px)'
+                    }}>
                     <div className="flex items-center space-x-3">
-                        <button onClick={toggleSidebar} className="p-2 text-gold-400 hover:text-white hover:bg-gold-400/10 rounded-xl transition-all border border-gold-400/15 hover:border-gold-400/40 active:scale-95">
+                        <button onClick={toggleSidebar} className="p-2.5 text-gold-400 hover:text-white rounded-xl transition-all border border-gold-400/25 hover:border-gold-400/50 active:scale-95"
+                            style={{ background: 'rgba(251, 191, 36, 0.08)', boxShadow: '0 0 15px rgba(251, 191, 36, 0.1)' }}>
                             <Menu size={20} />
                         </button>
-                        <span className="text-2xl font-display font-bold bg-gradient-to-r from-gold-300 via-gold-400 to-gold-600 bg-clip-text text-transparent tracking-[0.2em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                            PARSEC<span className="text-white/70 text-xs font-tech tracking-[0.15em] ml-2">GYM</span>
+                        <span className="text-2xl font-display font-bold tracking-[0.2em]"
+                            style={{
+                                background: 'linear-gradient(135deg, #fde68a 0%, #fbbf24 40%, #f59e0b 70%, #d97706 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.4))'
+                            }}>
+                            PARSEC<span style={{
+                                WebkitTextFillColor: 'rgba(255,255,255,0.8)',
+                                fontSize: '0.65rem',
+                                fontFamily: "'Rajdhani', sans-serif",
+                                letterSpacing: '0.15em',
+                                marginLeft: '8px'
+                            }}>GYM</span>
                         </span>
                     </div>
-                    <div className="flex items-center justify-center w-9 h-9 border border-gold-400/30 rounded-full text-gold-400 bg-gold-400/5 shadow-[0_0_12px_rgba(251,191,36,0.15)]">
-                        <Shield size={16} />
+                    <div className="flex items-center justify-center w-10 h-10 border border-gold-400/35 rounded-full text-gold-400"
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.04))',
+                            boxShadow: '0 0 18px rgba(251, 191, 36, 0.2), inset 0 0 8px rgba(251, 191, 36, 0.05)'
+                        }}>
+                        <Shield size={17} />
                     </div>
                 </div>
-                {/* Gold accent line */}
-                <div className="h-[1px] bg-gradient-to-r from-transparent via-gold-400/50 to-transparent"></div>
+                {/* Gold accent line with glow */}
+                <div className="h-[2px]" style={{
+                    background: 'linear-gradient(90deg, transparent 5%, rgba(251, 191, 36, 0.6) 50%, transparent 95%)',
+                    boxShadow: '0 0 12px rgba(251, 191, 36, 0.3), 0 0 30px rgba(251, 191, 36, 0.1)'
+                }}></div>
             </header>
 
             {/* Main Content */}
-            <main className="flex-grow pt-[68px] p-4 overflow-y-auto">
+            <main className="flex-grow pt-[72px] p-4 overflow-y-auto">
                 <Outlet />
             </main>
 
@@ -80,23 +104,27 @@ const Layout = () => {
                             transition={{ type: 'spring', damping: 28, stiffness: 250 }}
                             className="fixed top-0 left-0 bottom-0 w-[280px] z-50 overflow-y-auto"
                             style={{
-                                background: 'linear-gradient(180deg, rgba(10, 13, 20, 0.98) 0%, rgba(5, 8, 22, 0.99) 100%)',
-                                borderRight: '1px solid rgba(251, 191, 36, 0.15)',
-                                boxShadow: '0 0 60px rgba(0,0,0,0.9), 0 0 30px rgba(251, 191, 36, 0.05)'
+                                background: 'linear-gradient(180deg, rgba(10, 15, 28, 0.98) 0%, rgba(8, 13, 26, 0.99) 100%)',
+                                borderRight: '1px solid rgba(251, 191, 36, 0.2)',
+                                boxShadow: '0 0 60px rgba(0,0,0,0.9), 0 0 40px rgba(251, 191, 36, 0.08)'
                             }}
                         >
                             {/* Sidebar Header */}
-                            <div className="p-5 flex justify-between items-center border-b border-gold-400/15">
+                            <div className="p-5 flex justify-between items-center border-b border-gold-400/20">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-[0_0_12px_rgba(251,191,36,0.3)]">
-                                        <Shield size={16} className="text-black" />
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                                        style={{
+                                            background: 'linear-gradient(135deg, #fbbf24, #d97706)',
+                                            boxShadow: '0 0 18px rgba(251, 191, 36, 0.4), 0 0 40px rgba(251, 191, 36, 0.1)'
+                                        }}>
+                                        <Shield size={17} className="text-black" />
                                     </div>
                                     <div>
-                                        <span className="font-display font-bold text-gold-400 tracking-[0.15em] text-sm">ADMIN</span>
-                                        <div className="text-[10px] font-tech text-gray-600 tracking-wider">COMMANDER</div>
+                                        <span className="font-display font-bold text-gold-400 tracking-[0.15em] text-sm" style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.3)' }}>ADMIN</span>
+                                        <div className="text-[10px] font-tech text-gray-500 tracking-wider">COMMANDER</div>
                                     </div>
                                 </div>
-                                <button onClick={toggleSidebar} className="text-gray-500 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-all">
+                                <button onClick={toggleSidebar} className="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition-all">
                                     <X size={20} />
                                 </button>
                             </div>
@@ -111,17 +139,24 @@ const Layout = () => {
                                             onClick={() => handleNavigation(item.path)}
                                             whileTap={{ scale: 0.97 }}
                                             className={`w-full flex items-center gap-3.5 px-4 py-3.5 text-sm font-tech tracking-wider transition-all duration-200 rounded-xl relative ${isActive
-                                                ? 'bg-gold-400/10 text-gold-400'
-                                                : 'text-gray-500 hover:text-gray-200 hover:bg-white/[0.03]'
+                                                ? 'text-gold-400'
+                                                : 'text-gray-400 hover:text-gray-200 hover:bg-white/[0.04]'
                                                 }`}
+                                            style={isActive ? {
+                                                background: 'rgba(251, 191, 36, 0.1)',
+                                                boxShadow: '0 0 15px rgba(251, 191, 36, 0.08)'
+                                            } : {}}
                                         >
                                             {isActive && (
-                                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 bg-gold-400 rounded-r-full shadow-[0_0_8px_rgba(251,191,36,0.5)]"></div>
+                                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 bg-gold-400 rounded-r-full" style={{ boxShadow: '0 0 10px rgba(251, 191, 36, 0.6)' }}></div>
                                             )}
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive
-                                                ? 'bg-gold-400/15 shadow-[0_0_8px_rgba(251,191,36,0.2)]'
-                                                : 'bg-white/[0.03]'
-                                                }`}>
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center`}
+                                                style={isActive ? {
+                                                    background: 'rgba(251, 191, 36, 0.15)',
+                                                    boxShadow: '0 0 10px rgba(251, 191, 36, 0.2)'
+                                                } : {
+                                                    background: 'rgba(255, 255, 255, 0.05)'
+                                                }}>
                                                 {item.icon}
                                             </div>
                                             <span className="font-medium">{item.label}</span>
@@ -131,8 +166,8 @@ const Layout = () => {
                             </div>
 
                             {/* Sidebar Footer */}
-                            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.04]">
-                                <div className="text-[10px] font-tech text-gray-700 tracking-wider text-center">
+                            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.06]">
+                                <div className="text-[10px] font-tech text-gray-600 tracking-wider text-center">
                                     PARSEC GYM &copy; 2025
                                 </div>
                             </div>

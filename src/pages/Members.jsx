@@ -319,7 +319,8 @@ const Members = () => {
                     onClick={() => handleOpenModal(false)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="bg-gradient-to-br from-gold-400 to-gold-600 text-black p-2.5 rounded-xl shadow-[0_4px_15px_rgba(251,191,36,0.2)] relative overflow-hidden shimmer-hover"
+                    className="bg-gradient-to-br from-gold-400 to-gold-600 text-black p-2.5 rounded-xl relative overflow-hidden shimmer-hover"
+                    style={{ boxShadow: '0 0 20px rgba(251, 191, 36, 0.35), 0 4px 15px rgba(0, 0, 0, 0.4)' }}
                 >
                     <Plus size={20} strokeWidth={2.5} />
                 </motion.button>
@@ -328,7 +329,7 @@ const Members = () => {
             {/* Search Bar */}
             <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Search className="text-gray-600 group-focus-within:text-gold-400 transition-colors duration-300" size={18} />
+                    <Search className="text-gray-500 group-focus-within:text-gold-400 transition-colors duration-300" size={18} />
                 </div>
                 <input
                     type="text"
@@ -361,10 +362,10 @@ const Members = () => {
                                 transition={{ duration: 0.25 }}
                                 style={{ zIndex: activeMenuId === member.id ? 20 : 0 }}
                                 className={`p-3.5 rounded-xl flex justify-between items-center border transition-all duration-300 relative ${isExpired
-                                        ? 'bg-red-950/20 border-red-500/15 status-expired'
-                                        : isExpiringSoon
-                                            ? 'bg-amber-950/10 border-amber-500/15 status-warning'
-                                            : 'bg-[#0a0f1a]/60 border-white/[0.04] hover:border-gold-400/20 status-active'
+                                    ? 'bg-red-950/30 border-red-500/20 status-expired'
+                                    : isExpiringSoon
+                                        ? 'bg-amber-950/20 border-amber-500/20 status-warning'
+                                        : 'bg-[#0c1220]/80 border-white/[0.06] hover:border-gold-400/25 status-active'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
@@ -372,8 +373,8 @@ const Members = () => {
                                         <img src={member.photo} alt={member.name} className="w-11 h-11 rounded-xl object-cover border border-gold-400/20 shadow-md" />
                                     ) : (
                                         <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm font-display border ${isExpired ? 'bg-red-500/10 border-red-500/20 text-red-400' :
-                                                isExpiringSoon ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
-                                                    'bg-emerald-500/8 border-emerald-500/15 text-emerald-400'
+                                            isExpiringSoon ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
+                                                'bg-emerald-500/8 border-emerald-500/15 text-emerald-400'
                                             }`}>
                                             {member.name.charAt(0)}
                                         </div>
@@ -385,8 +386,8 @@ const Members = () => {
                                                 {formatDate(member.expiry)}
                                             </span>
                                             <span className={`text-[9px] uppercase font-bold tracking-[0.12em] px-1.5 py-0.5 rounded-md ${isExpired ? 'text-red-400 bg-red-500/10' :
-                                                    isExpiringSoon ? 'text-amber-400 bg-amber-500/10' :
-                                                        'text-emerald-400 bg-emerald-500/8'
+                                                isExpiringSoon ? 'text-amber-400 bg-amber-500/10' :
+                                                    'text-emerald-400 bg-emerald-500/8'
                                                 }`}>
                                                 {isExpired ? 'EXPIRED' : member.status}
                                             </span>
@@ -439,7 +440,7 @@ const Members = () => {
                                             e.stopPropagation();
                                             setActiveMenuId(activeMenuId === member.id ? null : member.id);
                                         }}
-                                        className="p-1.5 bg-white/[0.03] text-gray-600 rounded-lg hover:bg-white/[0.06] hover:text-gray-400 border border-white/[0.04] transition-all"
+                                        className="p-1.5 bg-white/[0.05] text-gray-500 rounded-lg hover:bg-white/[0.08] hover:text-gray-300 border border-white/[0.06] transition-all"
                                     >
                                         <MoreVertical size={16} />
                                     </button>
@@ -477,7 +478,7 @@ const Members = () => {
                 ) : (
                     <div className="empty-state">
                         <div className="empty-state-icon">
-                            <Users size={28} className="text-gold-400/40" />
+                            <Users size={28} className="text-gold-400/70" />
                         </div>
                         <p className="empty-state-title">No members found</p>
                         <p className="empty-state-sub">Add your first member to get started</p>

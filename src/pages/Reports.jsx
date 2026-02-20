@@ -60,15 +60,15 @@ const Reports = () => {
             className="pb-24 px-4 space-y-6 pt-4 relative min-h-screen"
         >
             <div>
-                <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase">Results & Reports</h1>
-                <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1"></div>
+                <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.25)' }}>Results & Reports</h1>
+                <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1" style={{ boxShadow: '0 0 8px rgba(251, 191, 36, 0.3)' }}></div>
             </div>
 
             {!selectedMember ? (
                 <div className="space-y-4">
                     <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <Search className="text-gray-600 group-focus-within:text-gold-400 transition-colors" size={18} />
+                            <Search className="text-gray-500 group-focus-within:text-gold-400 transition-colors" size={18} />
                         </div>
                         <input
                             type="text"
@@ -100,7 +100,7 @@ const Reports = () => {
                         {filteredMembers.length === 0 && (
                             <div className="empty-state">
                                 <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                                    <FileText className="w-14 h-14 mx-auto mb-3 text-gold-500/30" />
+                                    <FileText className="w-14 h-14 mx-auto mb-3 text-gold-500/40" />
                                 </motion.div>
                                 <p className="text-gray-500 font-tech tracking-wider">No members found</p>
                             </div>
@@ -147,7 +147,7 @@ const Reports = () => {
                                     </div>
                                     <div>
                                         <h2 className="text-xl font-display font-bold text-white">{selectedMember.name}</h2>
-                                        <p className="text-gray-500 text-xs font-tech mt-0.5">Joined: {selectedMember.startDate}</p>
+                                        <p className="text-gray-400 text-xs font-tech mt-0.5">Joined: {selectedMember.startDate}</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -159,7 +159,7 @@ const Reports = () => {
                             {/* Attendance Score */}
                             <div className="glass-card p-4 flex items-center justify-between border-l-2 border-l-gold-500/50">
                                 <div>
-                                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest flex items-center gap-1">
+                                    <p className="text-[10px] font-tech text-gray-500 uppercase tracking-widest flex items-center gap-1">
                                         <Calendar size={11} /> Attendance Score
                                     </p>
                                     <p className="text-3xl font-display font-black text-gold-400 mt-1">{attendancePercentage}%</p>
@@ -187,12 +187,12 @@ const Reports = () => {
                             {/* Stats Grid */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="glass-card p-4 border-l-2 border-l-emerald-500/40">
-                                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">BMI Score</p>
+                                    <p className="text-[10px] font-tech text-gray-500 uppercase tracking-widest">BMI Score</p>
                                     <div className="flex items-end gap-2 mt-2">
                                         <span className={`text-2xl font-display font-black ${bmiData.color}`}>{bmiData.value}</span>
                                         <span className={`text-xs font-tech font-bold px-2 py-0.5 rounded-md bg-white/5 border border-white/5 ${bmiData.color}`}>{bmiData.status}</span>
                                     </div>
-                                    <p className="text-[10px] text-gray-600 mt-1.5 font-tech">
+                                    <p className="text-[10px] text-gray-500 mt-1.5 font-tech">
                                         {bmiData.status === 'Unknown' ? "Update height to see BMI" : "Based on weight & height"}
                                     </p>
                                 </div>
@@ -202,7 +202,7 @@ const Reports = () => {
                                         {weightProgress.icon}
                                         <span className="font-display font-bold text-white text-base">{weightProgress.text}</span>
                                     </div>
-                                    <p className="text-[10px] text-gray-600 mt-1.5 font-tech">
+                                    <p className="text-[10px] text-gray-500 mt-1.5 font-tech">
                                         Initial: {initialWeight}kg → Now: {currentWeight}kg
                                     </p>
                                 </div>

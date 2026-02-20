@@ -63,8 +63,8 @@ const Attendance = () => {
             {/* Header */}
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase">Attendance</h1>
-                    <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1"></div>
+                    <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.25)' }}>Attendance</h1>
+                    <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1" style={{ boxShadow: '0 0 8px rgba(251, 191, 36, 0.3)' }}></div>
                     <p className="text-sm text-gray-500 font-tech mt-1.5">
                         {new Date(date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
@@ -74,15 +74,15 @@ const Attendance = () => {
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-3">
                 <div className="glass-card p-3 text-center border-l-2 border-l-emerald-500/50">
-                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">Present</p>
+                    <p className="text-[10px] font-tech text-gray-500 uppercase tracking-widest">Present</p>
                     <p className="text-xl font-display font-black text-emerald-400">{presentCount}</p>
                 </div>
                 <div className="glass-card p-3 text-center border-l-2 border-l-red-500/50">
-                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">Absent</p>
+                    <p className="text-[10px] font-tech text-gray-500 uppercase tracking-widest">Absent</p>
                     <p className="text-xl font-display font-black text-red-400">{absentCount}</p>
                 </div>
                 <div className="glass-card p-3 text-center border-l-2 border-l-gold-500/50">
-                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">Rate</p>
+                    <p className="text-[10px] font-tech text-gray-500 uppercase tracking-widest">Rate</p>
                     <p className="text-xl font-display font-black text-gold-400">{percentage}%</p>
                 </div>
             </div>
@@ -118,7 +118,7 @@ const Attendance = () => {
             {/* Search */}
             <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Search className="text-gray-600 group-focus-within:text-gold-400 transition-colors" size={18} />
+                    <Search className="text-gray-500 group-focus-within:text-gold-400 transition-colors" size={18} />
                 </div>
                 <input
                     type="text"

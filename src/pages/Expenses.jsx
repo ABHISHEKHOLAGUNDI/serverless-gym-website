@@ -74,13 +74,13 @@ const Expenses = () => {
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase">Financials</h1>
-                    <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1"></div>
+                    <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.25)' }}>Financials</h1>
+                    <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1" style={{ boxShadow: '0 0 8px rgba(251, 191, 36, 0.3)' }}></div>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className="cosmic-btn text-sm"
-                >
+                    style={{ boxShadow: '0 0 20px rgba(251, 191, 36, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4)' }}>
                     <Plus size={16} /> Add Expense
                 </button>
             </div>
@@ -125,7 +125,7 @@ const Expenses = () => {
                 {filteredTransactions.length === 0 ? (
                     <div className="empty-state">
                         <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                            <Wallet className="w-14 h-14 mx-auto mb-3 text-gold-500/30" />
+                            <Wallet className="w-14 h-14 mx-auto mb-3 text-gold-500/40" />
                         </motion.div>
                         <p className="font-tech tracking-wider text-gray-500">No transactions found</p>
                         <p className="text-xs text-gray-700 font-tech mt-1">Add an expense to get started</p>

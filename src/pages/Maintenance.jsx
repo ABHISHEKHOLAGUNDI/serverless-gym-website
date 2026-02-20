@@ -52,13 +52,13 @@ const Maintenance = () => {
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase">Maintenance</h1>
-                    <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1"></div>
+                    <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.25)' }}>Maintenance</h1>
+                    <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1" style={{ boxShadow: '0 0 8px rgba(251, 191, 36, 0.3)' }}></div>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
                     className="cosmic-btn text-sm"
-                >
+                    style={{ boxShadow: '0 0 20px rgba(251, 191, 36, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4)' }}>
                     <Plus size={16} /> Add Machine
                 </button>
             </div>
@@ -66,15 +66,15 @@ const Maintenance = () => {
             {/* Stats Strip */}
             <div className="grid grid-cols-3 gap-3">
                 <div className="glass-card p-3 text-center border-l-2 border-l-emerald-500/50">
-                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">Working</p>
+                    <p className="text-[10px] font-tech text-gray-500 uppercase tracking-widest">Working</p>
                     <p className="text-xl font-display font-black text-emerald-400">{operational}</p>
                 </div>
                 <div className="glass-card p-3 text-center border-l-2 border-l-amber-500/50">
-                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">Servicing</p>
+                    <p className="text-[10px] font-tech text-gray-500 uppercase tracking-widest">Servicing</p>
                     <p className="text-xl font-display font-black text-amber-400">{underMaint}</p>
                 </div>
                 <div className="glass-card p-3 text-center border-l-2 border-l-red-500/50">
-                    <p className="text-[10px] font-tech text-gray-600 uppercase tracking-widest">Broken</p>
+                    <p className="text-[10px] font-tech text-gray-500 uppercase tracking-widest">Broken</p>
                     <p className="text-xl font-display font-black text-red-400">{broken}</p>
                 </div>
             </div>
@@ -84,7 +84,7 @@ const Maintenance = () => {
                 {machines.length === 0 ? (
                     <div className="empty-state col-span-2">
                         <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                            <Settings className="w-14 h-14 mx-auto mb-3 text-gold-500/30" />
+                            <Settings className="w-14 h-14 mx-auto mb-3 text-gold-500/40" />
                         </motion.div>
                         <p className="font-tech tracking-wider text-gray-500">No machines added yet</p>
                         <p className="text-xs text-gray-700 font-tech mt-1">Add your first machine to track</p>
@@ -131,7 +131,7 @@ const Maintenance = () => {
                                         </div>
                                     </div>
                                     <div className="bg-[#050816]/60 border border-white/5 p-3 rounded-xl">
-                                        <label className="text-[10px] text-gray-600 block mb-1 font-tech uppercase tracking-widest">Next Due</label>
+                                        <label className="text-[10px] text-gray-500 block mb-1 font-tech uppercase tracking-widest">Next Due</label>
                                         <div className="flex items-center gap-2 font-tech text-gray-300">
                                             <Calendar size={13} className="text-gold-500" />
                                             {machine.nextMaintenance ? new Date(machine.nextMaintenance).toLocaleDateString() : 'N/A'}
