@@ -319,10 +319,11 @@ const Members = () => {
                     onClick={() => handleOpenModal(false)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="bg-gradient-to-br from-gold-400 to-gold-600 text-black p-2.5 rounded-xl relative overflow-hidden shimmer-hover"
-                    style={{ boxShadow: '0 0 20px rgba(251, 191, 36, 0.35), 0 4px 15px rgba(0, 0, 0, 0.4)' }}
+                    className="flex items-center gap-1.5 bg-gradient-to-br from-gold-400 to-gold-600 text-black px-4 py-2.5 rounded-xl relative overflow-hidden shimmer-hover font-tech font-bold tracking-wider text-sm"
+                    style={{ boxShadow: '0 0 22px rgba(251, 191, 36, 0.4), 0 4px 15px rgba(0, 0, 0, 0.5)' }}
                 >
-                    <Plus size={20} strokeWidth={2.5} />
+                    <Plus size={18} strokeWidth={2.5} />
+                    ADD
                 </motion.button>
             </div>
 
@@ -489,13 +490,13 @@ const Members = () => {
             {/* Add/Edit/Renew Modal */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020408]/85 backdrop-blur-md">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020408]/85 backdrop-blur-md overflow-y-auto">
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0, y: 10 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.95, opacity: 0, y: 10 }}
                             transition={{ duration: 0.2 }}
-                            className="glass-modal rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
+                            className="glass-modal rounded-2xl my-auto"
                         >
                             <div className="p-5 space-y-4">
                                 <div className="flex justify-between items-center pb-3 border-b border-white/[0.05]">
@@ -583,15 +584,15 @@ const Members = () => {
                                     {/* Plan Type Tabs */}
                                     <div className="space-y-1">
                                         <label className="cosmic-label">Plan Type</label>
-                                        <div className="flex bg-[#050816]/60 border border-white/[0.04] p-1 rounded-xl gap-1">
+                                        <div className="flex bg-[#080d1a]/80 border border-gold-400/15 p-1 rounded-xl gap-1">
                                             {['Monthly', 'Quarterly', 'Yearly'].map((plan) => (
                                                 <button
                                                     type="button"
                                                     key={plan}
                                                     onClick={() => setNewMember({ ...newMember, planType: plan })}
-                                                    className={`flex-1 py-2 rounded-lg text-sm font-tech font-semibold tracking-wider transition-all duration-200 ${newMember.planType === plan
-                                                        ? 'bg-gradient-to-r from-gold-400 to-gold-600 text-black shadow-[0_2px_8px_rgba(251,191,36,0.2)]'
-                                                        : 'text-gray-600 hover:text-gray-400 hover:bg-white/[0.03]'
+                                                    className={`flex-1 py-2.5 rounded-lg text-sm font-tech font-bold tracking-wider transition-all duration-200 ${newMember.planType === plan
+                                                        ? 'bg-gradient-to-r from-gold-400 to-gold-600 text-black shadow-[0_2px_10px_rgba(251,191,36,0.3)]'
+                                                        : 'text-gray-300 hover:text-white hover:bg-white/[0.06]'
                                                         }`}
                                                 >
                                                     {plan}

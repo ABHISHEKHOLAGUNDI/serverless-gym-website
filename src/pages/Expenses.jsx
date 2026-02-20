@@ -85,20 +85,37 @@ const Expenses = () => {
                 </button>
             </div>
 
-            {/* Tab Switcher */}
-            <div className="bg-[#0a0d14]/80 border border-gold-400/15 p-1 rounded-xl flex gap-1">
-                {['Expenses', 'Income', 'All'].map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => handleTabChange(tab)}
-                        className={`flex-1 py-2.5 rounded-lg text-sm font-tech tracking-wider transition-all ${activeTab === tab
-                            ? 'bg-gradient-to-br from-gold-500/20 to-gold-600/10 border border-gold-400/30 text-gold-400 shadow-[0_2px_12px_rgba(184,151,42,0.1)]'
-                            : 'text-gray-500 hover:text-gray-300'
-                            }`}
-                    >
-                        {tab}
-                    </button>
-                ))}
+            {/* Modern Tab Switcher with Sliding Indicator */}
+            <div className="relative p-1 rounded-2xl" style={{
+                background: 'linear-gradient(180deg, rgba(8, 13, 26, 0.9) 0%, rgba(10, 15, 28, 0.85) 100%)',
+                border: '1px solid rgba(251, 191, 36, 0.15)',
+                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.4)'
+            }}>
+                {/* Sliding indicator */}
+                <div className="absolute top-1 bottom-1 rounded-xl transition-all duration-300 ease-out"
+                    style={{
+                        width: 'calc((100% - 8px) / 3)',
+                        left: `calc(4px + ${['Expenses', 'Income', 'All'].indexOf(activeTab)} * (100% - 8px) / 3)`,
+                        background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(217, 119, 6, 0.1))',
+                        border: '1px solid rgba(251, 191, 36, 0.35)',
+                        boxShadow: '0 0 15px rgba(251, 191, 36, 0.12), inset 0 1px 0 rgba(255,255,255,0.05)'
+                    }}
+                />
+                <div className="relative flex gap-0.5">
+                    {['Expenses', 'Income', 'All'].map(tab => (
+                        <button
+                            key={tab}
+                            onClick={() => handleTabChange(tab)}
+                            className={`flex-1 py-3 rounded-xl text-sm font-tech font-semibold tracking-[0.15em] uppercase transition-all duration-200 relative z-10 ${activeTab === tab
+                                ? 'text-gold-400'
+                                : 'text-gray-400 hover:text-gray-200'
+                                }`}
+                            style={activeTab === tab ? { textShadow: '0 0 10px rgba(251, 191, 36, 0.3)' } : {}}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Stats Banner */}
