@@ -83,6 +83,10 @@ export async function onRequestDelete(context) {
     if (!id) return Response.json({ error: "Missing ID" }, { status: 400 });
 
     try {
+        // Delete related records first to avoid FOREIGN KEY constraint
+        await env.DB.prepare("DELETE FROM attendance WHERE member_id = ?").bind(id).run();
+        await env.DB.prepare("DELETE FROM measurements WHERE member_id = ?").bind(id).run();
+        // Now delete the member
         await env.DB.prepare("DELETE FROM members WHERE id = ?").bind(id).run();
         return Response.json({ message: "Member deleted" });
     } catch (e) {
