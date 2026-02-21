@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Users, CalendarCheck, Settings, LogOut, FileText, DollarSign, Activity, Dumbbell, Shield } from 'lucide-react';
+import { Menu, X, Home, Users, CalendarCheck, Settings, LogOut, FileText, DollarSign, Activity, Dumbbell, Shield, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGymContext } from '../context/GymContext';
 
 const Layout = () => {
-    const { dbError } = useGymContext();
+    const { dbError, resetAllData } = useGymContext();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [resetLoading, setResetLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -165,8 +166,34 @@ const Layout = () => {
                                 })}
                             </div>
 
-                            {/* Sidebar Footer */}
-                            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.06]">
+                            {/* Sidebar Footer with Hard Reset */}
+                            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.06] space-y-3">
+                                <button
+                                    disabled={resetLoading}
+                                    onClick={async () => {
+                                        if (!window.confirm('⚠️ WARNING: This will permanently delete ALL data — members, income, expenses, trainers, machines, attendance, and measurements.\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?')) return;
+                                        const typed = window.prompt('Type "RESET" to confirm:');
+                                        if (typed !== 'RESET') { alert('Reset cancelled. You must type RESET exactly.'); return; }
+                                        setResetLoading(true);
+                                        const success = await resetAllData();
+                                        setResetLoading(false);
+                                        if (success) {
+                                            alert('✅ All data has been cleared. The app is now fresh.');
+                                            setIsSidebarOpen(false);
+                                            navigate('/dashboard');
+                                        }
+                                    }}
+                                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-tech font-bold tracking-wider transition-all duration-200 border"
+                                    style={{
+                                        background: 'rgba(220, 38, 38, 0.1)',
+                                        borderColor: 'rgba(220, 38, 38, 0.35)',
+                                        color: '#f87171',
+                                        boxShadow: '0 0 15px rgba(220, 38, 38, 0.08)'
+                                    }}
+                                >
+                                    <AlertTriangle size={16} />
+                                    {resetLoading ? 'RESETTING...' : 'HARD RESET'}
+                                </button>
                                 <div className="text-[10px] font-tech text-gray-600 tracking-wider text-center">
                                     PARSEC GYM &copy; 2025
                                 </div>

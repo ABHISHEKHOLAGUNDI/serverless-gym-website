@@ -362,13 +362,35 @@ export const GymProvider = ({ children }) => {
         }
     };
 
+    // Hard Reset: Delete ALL data from the database
+    const resetAllData = async () => {
+        try {
+            const res = await fetch('/api/reset', { method: 'POST' });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || 'Reset failed');
+            }
+            // Clear all local state
+            setMembers([]);
+            setTransactions([]);
+            setTrainers([]);
+            setMachines([]);
+            return true;
+        } catch (err) {
+            console.error("Reset failed", err);
+            alert("Failed to reset data: " + err.message);
+            return false;
+        }
+    };
+
     return (
         <GymContext.Provider value={{
             members, transactions, trainers, machines, stats, loading, dbError,
             addMember, updateMember, deleteMember, renewMember,
             addTransaction, deleteTransaction,
             addTrainer, updateTrainer, deleteTrainer,
-            addMachine, updateMachine, deleteMachine
+            addMachine, updateMachine, deleteMachine,
+            resetAllData
         }}>
             {children}
         </GymContext.Provider>
