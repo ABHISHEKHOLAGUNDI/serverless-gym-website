@@ -1,28 +1,44 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, ArrowRight } from 'lucide-react';
+import { Lock, ArrowRight, Phone, User, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+    const [loginMode, setLoginMode] = useState('admin'); // 'admin' | 'member'
     const [password, setPassword] = useState('');
+    const [phone, setPhone] = useState('');
+    const [memberPassword, setMemberPassword] = useState('');
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, memberLogin } = useAuth();
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleLogin = async (e) => {
+    const handleAdminLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
-
         try {
             await login(password);
             navigate('/dashboard');
         } catch (err) {
             setError(err.message || 'Access Denied');
             setPassword('');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleMemberLogin = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        try {
+            await memberLogin(phone, memberPassword);
+            navigate('/portal');
+        } catch (err) {
+            setError(err.message || 'Login Failed');
         } finally {
             setLoading(false);
         }
@@ -42,16 +58,49 @@ const Login = () => {
                 transition={{ duration: 0.5 }}
                 className="w-full max-w-md p-8 relative z-10"
             >
-                {/* Glass Card */}
                 <div className="glass-card rounded-3xl p-8 text-center border border-gold-400/20 shadow-[0_0_40px_rgba(0,0,0,0.5)]">
 
                     {/* Header Icon */}
                     <div className="w-20 h-20 bg-gradient-to-tr from-gold-500 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-gold-500/20 ring-4 ring-gold-500/10">
-                        <Lock className="text-white" size={32} />
+                        {loginMode === 'admin' ? <Shield className="text-white" size={32} /> : <User className="text-white" size={32} />}
                     </div>
 
-                    <h2 className="text-3xl font-display font-bold text-gold-400 mb-2 tracking-widest uppercase drop-shadow-md">Access Control</h2>
-                    <p className="text-gray-400 mb-8 text-sm font-tech tracking-wider">SECURE TERMINAL LOGIN</p>
+                    <h2 className="text-3xl font-display font-bold text-gold-400 mb-2 tracking-widest uppercase drop-shadow-md">
+                        {loginMode === 'admin' ? 'Owner Login' : 'Member Login'}
+                    </h2>
+                    <p className="text-gray-400 mb-6 text-sm font-tech tracking-wider">
+                        {loginMode === 'admin' ? 'ENTER ADMIN PIN' : 'ENTER YOUR CREDENTIALS'}
+                    </p>
+
+                    {/* Toggle Switch */}
+                    <div className="relative mb-6 p-1 rounded-2xl" style={{
+                        background: 'linear-gradient(180deg, rgba(8, 13, 26, 0.9) 0%, rgba(10, 15, 28, 0.85) 100%)',
+                        border: '1px solid rgba(251, 191, 36, 0.15)',
+                        boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.4)'
+                    }}>
+                        <div className="absolute top-1 bottom-1 rounded-xl transition-all duration-300 ease-out"
+                            style={{
+                                width: 'calc((100% - 8px) / 2)',
+                                left: loginMode === 'admin' ? '4px' : 'calc(4px + (100% - 8px) / 2)',
+                                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(217, 119, 6, 0.1))',
+                                border: '1px solid rgba(251, 191, 36, 0.35)',
+                                boxShadow: '0 0 15px rgba(251, 191, 36, 0.12)'
+                            }}
+                        />
+                        <div className="relative flex">
+                            {['admin', 'member'].map(mode => (
+                                <button
+                                    key={mode}
+                                    onClick={() => { setLoginMode(mode); setError(''); }}
+                                    className={`flex-1 py-3 rounded-xl text-sm font-tech font-semibold tracking-[0.15em] uppercase transition-all duration-200 relative z-10 flex items-center justify-center gap-2 ${loginMode === mode ? 'text-gold-400' : 'text-gray-400 hover:text-gray-200'}`}
+                                    style={loginMode === mode ? { textShadow: '0 0 10px rgba(251, 191, 36, 0.3)' } : {}}
+                                >
+                                    {mode === 'admin' ? <Shield size={14} /> : <User size={14} />}
+                                    {mode === 'admin' ? 'Owner' : 'Member'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
 
                     {/* Error Message */}
                     {error && (
@@ -64,8 +113,15 @@ const Login = () => {
                         </motion.div>
                     )}
 
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        <div className="relative">
+                    {/* Admin Login Form */}
+                    {loginMode === 'admin' && (
+                        <motion.form
+                            key="admin"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            onSubmit={handleAdminLogin}
+                            className="space-y-6"
+                        >
                             <input
                                 type="password"
                                 value={password}
@@ -75,31 +131,85 @@ const Login = () => {
                                 maxLength={6}
                                 autoFocus
                             />
-                        </div>
-
-                        <motion.button
-                            whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(251, 191, 36, 0.3)" }}
-                            whileTap={{ scale: 0.98 }}
-                            type="submit"
-                            disabled={password.length !== 6 || loading}
-                            className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all font-display tracking-wider ${password.length === 6
+                            <motion.button
+                                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(251, 191, 36, 0.3)" }}
+                                whileTap={{ scale: 0.98 }}
+                                type="submit"
+                                disabled={password.length !== 6 || loading}
+                                className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all font-display tracking-wider ${password.length === 6
                                     ? 'bg-gradient-to-r from-gold-500 via-amber-500 to-gold-600 text-black shadow-lg shadow-gold-500/20'
                                     : 'bg-white/5 text-gray-600 cursor-not-allowed border border-white/5'
-                                }`}
+                                    }`}
+                            >
+                                {loading ? (
+                                    <span className="w-5 h-5 border-2 border-amber-900/30 border-t-amber-900 rounded-full animate-spin"></span>
+                                ) : (
+                                    <>UNLOCK TERMINAL <ArrowRight size={20} /></>
+                                )}
+                            </motion.button>
+                        </motion.form>
+                    )}
+
+                    {/* Member Login Form */}
+                    {loginMode === 'member' && (
+                        <motion.form
+                            key="member"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            onSubmit={handleMemberLogin}
+                            className="space-y-4"
                         >
-                            {loading ? (
-                                <span className="w-5 h-5 border-2 border-amber-900/30 border-t-amber-900 rounded-full animate-spin"></span>
-                            ) : (
-                                <>
-                                    UNLOCK TERMINAL <ArrowRight size={20} />
-                                </>
-                            )}
-                        </motion.button>
-                    </form>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <Phone className="text-gold-400/50" size={18} />
+                                </div>
+                                <input
+                                    type="tel"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
+                                    className="w-full bg-[#050816]/50 border border-gold-400/20 rounded-2xl py-4 pl-12 pr-4 text-lg font-tech text-gold-100 tracking-wider focus:outline-none focus:border-gold-400 focus:bg-[#050816]/80 transition-all placeholder-gray-600 shadow-inner"
+                                    placeholder="Phone Number"
+                                    maxLength={10}
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <Lock className="text-gold-400/50" size={18} />
+                                </div>
+                                <input
+                                    type="password"
+                                    value={memberPassword}
+                                    onChange={(e) => setMemberPassword(e.target.value)}
+                                    className="w-full bg-[#050816]/50 border border-gold-400/20 rounded-2xl py-4 pl-12 pr-4 text-lg font-tech text-gold-100 tracking-wider focus:outline-none focus:border-gold-400 focus:bg-[#050816]/80 transition-all placeholder-gray-600 shadow-inner"
+                                    placeholder="Password"
+                                />
+                            </div>
+                            <p className="text-[10px] font-tech text-gray-500 tracking-wider">
+                                Password = Your Phone Number + Birth Year
+                            </p>
+                            <motion.button
+                                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(251, 191, 36, 0.3)" }}
+                                whileTap={{ scale: 0.98 }}
+                                type="submit"
+                                disabled={phone.length < 10 || !memberPassword || loading}
+                                className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all font-display tracking-wider ${phone.length >= 10 && memberPassword
+                                    ? 'bg-gradient-to-r from-gold-500 via-amber-500 to-gold-600 text-black shadow-lg shadow-gold-500/20'
+                                    : 'bg-white/5 text-gray-600 cursor-not-allowed border border-white/5'
+                                    }`}
+                            >
+                                {loading ? (
+                                    <span className="w-5 h-5 border-2 border-amber-900/30 border-t-amber-900 rounded-full animate-spin"></span>
+                                ) : (
+                                    <>LOGIN <ArrowRight size={20} /></>
+                                )}
+                            </motion.button>
+                        </motion.form>
+                    )}
                 </div>
 
                 <p className="text-center text-gray-600 text-[10px] mt-8 font-tech tracking-[0.2em] uppercase opacity-50">
-                    &copy; 2026 FitTrack Pro. Secure System.
+                    &copy; 2026 Parsec Gym. Secure System.
                 </p>
             </motion.div>
         </div>

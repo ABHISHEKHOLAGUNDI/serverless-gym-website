@@ -65,3 +65,33 @@ CREATE TABLE measurements (
   calves REAL,
   FOREIGN KEY (member_id) REFERENCES members(id)
 );
+
+DROP TABLE IF EXISTS workout_plans;
+CREATE TABLE workout_plans (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  member_id INTEGER NOT NULL,
+  day TEXT,
+  exercises TEXT,
+  created_at DATE DEFAULT (DATE('now')),
+  FOREIGN KEY (member_id) REFERENCES members(id)
+);
+
+DROP TABLE IF EXISTS diet_plans;
+CREATE TABLE diet_plans (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  member_id INTEGER NOT NULL,
+  meal_type TEXT,
+  items TEXT,
+  created_at DATE DEFAULT (DATE('now')),
+  FOREIGN KEY (member_id) REFERENCES members(id)
+);
+
+DROP TABLE IF EXISTS chat_messages;
+CREATE TABLE chat_messages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  member_id INTEGER NOT NULL,
+  sender TEXT,
+  message TEXT NOT NULL,
+  created_at DATETIME DEFAULT (DATETIME('now')),
+  FOREIGN KEY (member_id) REFERENCES members(id)
+);

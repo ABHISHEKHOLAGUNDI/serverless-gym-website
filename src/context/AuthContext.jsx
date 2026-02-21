@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
             const res = await fetch('/api/auth/verify');
             if (res.ok) {
                 const data = await res.json();
-                setUser(data.user);
+                setUser(data.user); // { name, role, memberId? }
             } else {
                 setUser(null);
             }
@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Admin login with PIN
     const login = async (pin) => {
         const res = await fetch('/api/auth/login', {
             method: 'POST',
@@ -35,7 +36,24 @@ export const AuthProvider = ({ children }) => {
         });
 
         if (res.ok) {
-            await checkAuth(); // Re-verify to get user data
+            await checkAuth();
+            return true;
+        } else {
+            const data = await res.json();
+            throw new Error(data.error || 'Login failed');
+        }
+    };
+
+    // Member login with phone + password
+    const memberLogin = async (phone, password) => {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, password })
+        });
+
+        if (res.ok) {
+            await checkAuth();
             return true;
         } else {
             const data = await res.json();
@@ -52,8 +70,17 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const isAdmin = user?.role === 'admin';
+    const isMember = user?.role === 'member';
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading, isAuthenticated: !!user }}>
+        <AuthContext.Provider value={{
+            user, login, memberLogin, logout, loading,
+            isAuthenticated: !!user,
+            isAdmin,
+            isMember,
+            memberId: user?.memberId
+        }}>
             {children}
         </AuthContext.Provider>
     );

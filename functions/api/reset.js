@@ -2,6 +2,9 @@ export async function onRequestPost(context) {
     const { env } = context;
     try {
         // Delete all data from all tables (order matters for foreign keys)
+        await env.DB.prepare("DELETE FROM chat_messages").run();
+        await env.DB.prepare("DELETE FROM workout_plans").run();
+        await env.DB.prepare("DELETE FROM diet_plans").run();
         await env.DB.prepare("DELETE FROM attendance").run();
         await env.DB.prepare("DELETE FROM measurements").run();
         await env.DB.prepare("DELETE FROM finances").run();

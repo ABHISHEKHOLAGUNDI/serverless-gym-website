@@ -2,8 +2,8 @@ export async function onRequest(context) {
     const { request, next, env } = context;
     const url = new URL(request.url);
 
-    // Allow Login endpoint to pass through
-    if (url.pathname === '/api/auth/login') {
+    // Allow Login and Logout endpoints to pass through
+    if (url.pathname === '/api/auth/login' || url.pathname === '/api/auth/logout') {
         return next();
     }
 
@@ -22,24 +22,46 @@ export async function onRequest(context) {
     const sessionValue = sessionMatch[1];
 
     try {
-        // Decode session: "admin:PIN:TIMESTAMP"
         const decoded = atob(sessionValue);
-        const [user, pin, timestamp] = decoded.split(':');
+        const parts = decoded.split(':');
+        const role = parts[0]; // "admin" or "member"
+        const timestamp = parseInt(parts[parts.length - 1]);
 
-        // Verify PIN ( Hardcoded '123456' or ENV)
-        const validPin = env.ADMIN_PIN || '123456';
-
-        if (pin !== validPin) {
-            return new Response(JSON.stringify({ error: 'Unauthorized: Invalid session' }), { status: 401 });
-        }
-
-        // Optional: Check Expiry (e.g., 24 hours)
+        // Check Expiry (24 hours)
         const oneDay = 24 * 60 * 60 * 1000;
-        if (Date.now() - parseInt(timestamp) > oneDay) {
+        if (Date.now() - timestamp > oneDay) {
             return new Response(JSON.stringify({ error: 'Unauthorized: Session expired' }), { status: 401 });
         }
 
-        // Pass to next handler
+        if (role === 'admin') {
+            // Admin session: "admin:PIN:timestamp"
+            const pin = parts[1];
+            const validPin = env.ADMIN_PIN || '123456';
+            if (pin !== validPin) {
+                return new Response(JSON.stringify({ error: 'Unauthorized: Invalid admin session' }), { status: 401 });
+            }
+            // Store role info for downstream handlers
+            context.data = { role: 'admin' };
+
+        } else if (role === 'member') {
+            // Member session: "member:MEMBER_ID:MEMBER_NAME:timestamp"
+            const memberId = parseInt(parts[1]);
+            const memberName = parts[2];
+
+            // Members can only access portal endpoints and auth endpoints
+            const allowedPaths = ['/api/auth/verify', '/api/auth/logout', '/api/portal/'];
+            const isAllowed = allowedPaths.some(p => url.pathname.startsWith(p));
+
+            if (!isAllowed) {
+                return new Response(JSON.stringify({ error: 'Unauthorized: Members cannot access admin endpoints' }), { status: 403 });
+            }
+
+            context.data = { role: 'member', memberId, memberName };
+
+        } else {
+            return new Response(JSON.stringify({ error: 'Unauthorized: Unknown role' }), { status: 401 });
+        }
+
         return next();
 
     } catch (e) {
