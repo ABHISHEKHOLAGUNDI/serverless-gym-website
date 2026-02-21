@@ -95,3 +95,11 @@ CREATE TABLE chat_messages (
   created_at DATETIME DEFAULT (DATETIME('now')),
   FOREIGN KEY (member_id) REFERENCES members(id)
 );
+
+DROP TABLE IF EXISTS rate_limits;
+CREATE TABLE rate_limits (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ip TEXT NOT NULL,
+  endpoint TEXT NOT NULL,
+  attempted_at DATETIME DEFAULT (DATETIME('now'))
+);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Printer, Share2, Activity, TrendingUp, TrendingDown, Calendar, ArrowLeft, BarChart3, FileText } from 'lucide-react';
+import { Search, Printer, Share2, Activity, TrendingUp, TrendingDown, Calendar, ArrowLeft, BarChart3, FileText, Download } from 'lucide-react';
 import { useGymContext } from '../context/GymContext';
 
 const Reports = () => {
@@ -62,6 +62,41 @@ const Reports = () => {
             <div>
                 <h1 className="text-2xl font-display font-bold text-gold-400 tracking-widest uppercase" style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.25)' }}>Results & Reports</h1>
                 <div className="h-0.5 w-12 bg-gradient-to-r from-gold-400 to-transparent rounded-full mt-1" style={{ boxShadow: '0 0 8px rgba(251, 191, 36, 0.3)' }}></div>
+            </div>
+
+            {/* ─── DATA EXPORT SECTION ─── */}
+            <div className="glass-card p-4 rounded-2xl border border-white/[0.06]">
+                <h3 className="text-xs font-tech text-gray-500 uppercase tracking-widest mb-3">Export Data (CSV)</h3>
+                <div className="grid grid-cols-3 gap-2">
+                    {[
+                        { label: 'Members', type: 'members' },
+                        { label: 'Finances', type: 'finances' },
+                        { label: 'Attendance', type: 'attendance' },
+                    ].map(exp => (
+                        <button
+                            key={exp.type}
+                            onClick={async () => {
+                                try {
+                                    const res = await fetch(`/api/export?type=${exp.type}`);
+                                    if (!res.ok) throw new Error('Export failed');
+                                    const blob = await res.blob();
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = `${exp.type}_${new Date().toISOString().split('T')[0]}.csv`;
+                                    a.click();
+                                    URL.revokeObjectURL(url);
+                                } catch (e) {
+                                    alert('Export failed: ' + e.message);
+                                }
+                            }}
+                            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white/5 border border-white/[0.06] text-sm font-tech text-gray-300 hover:bg-gold-400/10 hover:border-gold-400/20 hover:text-gold-400 transition-all"
+                        >
+                            <Download size={14} />
+                            {exp.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {!selectedMember ? (

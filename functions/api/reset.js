@@ -14,6 +14,8 @@ export async function onRequestPost(context) {
 
         return Response.json({ message: "All data has been reset successfully" });
     } catch (e) {
+        // Try to delete rate_limits too (may not exist)
+        try { await env.DB.prepare("DELETE FROM rate_limits").run(); } catch (_) { }
         return Response.json({ error: e.message }, { status: 500 });
     }
 }
