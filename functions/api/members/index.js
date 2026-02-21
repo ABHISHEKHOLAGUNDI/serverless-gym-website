@@ -10,11 +10,13 @@ export async function onRequestGet(context) {
             name: m.name,
             phone: m.phone,
             photo: m.photo,
+            height: m.height,
             planType: m.plan_type,
             amount: m.amount,
             startDate: m.start_date,
             expiry: m.expiry_date,
             dob: m.dob,
+            trainerId: m.trainer_id,
             status: m.status
         }));
         return Response.json(mappedResults);
@@ -27,11 +29,11 @@ export async function onRequestPost(context) {
     const { request, env } = context;
     try {
         const data = await request.json();
-        const { name, phone, photo, planType, amount, startDate, expiry, dob } = data;
+        const { name, phone, photo, height, planType, amount, startDate, expiry, dob, trainerId } = data;
 
         const info = await env.DB.prepare(
-            "INSERT INTO members (name, phone, photo, plan_type, amount, start_date, expiry_date, dob, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')"
-        ).bind(name, phone, photo, planType, amount, startDate, expiry, dob).run();
+            "INSERT INTO members (name, phone, photo, height, plan_type, amount, start_date, expiry_date, dob, trainer_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')"
+        ).bind(name, phone, photo || null, height || null, planType, amount, startDate, expiry, dob || null, trainerId || null).run();
 
         return Response.json({ message: "Member added", id: info.lastRowId }, { status: 201 });
     } catch (e) {
@@ -48,11 +50,13 @@ export async function onRequestPut(context) {
         const name = data.name || null;
         const phone = data.phone || null;
         const photo = data.photo || null;
+        const height = data.height || null;
         const planType = data.planType || null;
         const amount = data.amount || null;
         const startDate = data.startDate || null;
         const expiry = data.expiry || null;
         const dob = data.dob || null;
+        const trainerId = data.trainerId || null;
         const status = data.status || null;
 
         await env.DB.prepare(
@@ -60,14 +64,16 @@ export async function onRequestPut(context) {
                 name = COALESCE(?, name), 
                 phone = COALESCE(?, phone), 
                 photo = COALESCE(?, photo),
+                height = COALESCE(?, height),
                 plan_type = COALESCE(?, plan_type),
                 amount = COALESCE(?, amount),
                 start_date = COALESCE(?, start_date),
                 expiry_date = COALESCE(?, expiry_date),
                 dob = COALESCE(?, dob),
+                trainer_id = COALESCE(?, trainer_id),
                 status = COALESCE(?, status)
             WHERE id = ?`
-        ).bind(name, phone, photo, planType, amount, startDate, expiry, dob, status, id).run();
+        ).bind(name, phone, photo, height, planType, amount, startDate, expiry, dob, trainerId, status, id).run();
 
         return Response.json({ message: "Member updated" });
     } catch (e) {
@@ -93,3 +99,4 @@ export async function onRequestDelete(context) {
         return Response.json({ error: e.message }, { status: 500 });
     }
 }
+

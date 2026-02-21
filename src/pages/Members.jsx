@@ -85,9 +85,9 @@ const Members = () => {
     }, []);
 
     // ... (Auto-calculate End Date and Photo Upload handlers remain same) ...
-    // Auto-calculate End Date
+    // Auto-calculate End Date when start date or plan type changes
     useEffect(() => {
-        if (newMember.startDate && newMember.planType) {
+        if (isModalOpen && newMember.startDate && newMember.planType) {
             const start = new Date(newMember.startDate);
             let end = new Date(start);
             if (newMember.planType === 'Monthly') end.setMonth(end.getMonth() + 1);
@@ -96,32 +96,58 @@ const Members = () => {
 
             setNewMember(prev => ({ ...prev, endDate: end.toISOString().split('T')[0] }));
         }
-    }, [newMember.startDate, newMember.planType]);
+    }, [newMember.startDate, newMember.planType, isModalOpen]);
 
+    // Compress photo to 200x200 JPEG 60% quality to stay under D1's 100KB limit
     const handlePhotoUpload = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setNewMember(prev => ({ ...prev, photo: reader.result }));
-            };
-            reader.readAsDataURL(file);
-        }
+        if (!file) return;
+
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_SIZE = 200;
+            let w = img.width, h = img.height;
+            if (w > h) { h = (h / w) * MAX_SIZE; w = MAX_SIZE; }
+            else { w = (w / h) * MAX_SIZE; h = MAX_SIZE; }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const compressed = canvas.toDataURL('image/jpeg', 0.6);
+            setNewMember(prev => ({ ...prev, photo: compressed }));
+        };
+        img.src = URL.createObjectURL(file);
+    };
+
+    // Helper: compute end date from start + plan type
+    const calcEndDate = (startDate, planType) => {
+        if (!startDate || !planType) return '';
+        const start = new Date(startDate);
+        let end = new Date(start);
+        if (planType === 'Monthly') end.setMonth(end.getMonth() + 1);
+        else if (planType === 'Quarterly') end.setMonth(end.getMonth() + 3);
+        else if (planType === 'Yearly') end.setFullYear(end.getFullYear() + 1);
+        return end.toISOString().split('T')[0];
     };
 
     const handleOpenModal = (mode = false, member = null) => {
         setEditMode(mode);
+        const today = new Date().toISOString().split('T')[0];
         if (mode === 'edit' && member) {
             setSelectedMemberId(member.id);
+            const pt = member.planType || 'Monthly';
             setNewMember({
                 name: member.name,
                 phone: member.phone,
+                dob: member.dob || '',
                 height: member.height || '',
                 photo: member.photo,
-                planType: member.planType || 'Monthly',
+                planType: pt,
                 amount: member.amount || '',
-                startDate: new Date().toISOString().split('T')[0],
-                endDate: member.expiry,
+                startDate: member.startDate || today,
+                endDate: member.expiry || calcEndDate(member.startDate || today, pt),
+                trainerId: member.trainerId || '',
                 status: member.status
             });
         } else if (mode === 'renew' && member) {
@@ -129,12 +155,14 @@ const Members = () => {
             setNewMember({
                 name: member.name,
                 phone: member.phone,
+                dob: member.dob || '',
                 height: member.height || '',
                 photo: member.photo,
                 planType: 'Monthly',
                 amount: '',
-                startDate: new Date().toISOString().split('T')[0], // Default to Today
-                endDate: '',
+                startDate: today,
+                endDate: calcEndDate(today, 'Monthly'),
+                trainerId: member.trainerId || '',
                 status: 'Active'
             });
         } else {
@@ -143,12 +171,14 @@ const Members = () => {
             setNewMember({
                 name: '',
                 phone: '',
+                dob: '',
                 height: '',
                 photo: null,
                 planType: 'Monthly',
                 amount: '',
-                startDate: new Date().toISOString().split('T')[0],
-                endDate: '',
+                startDate: today,
+                endDate: calcEndDate(today, 'Monthly'),
+                trainerId: '',
                 status: 'Active'
             });
         }
@@ -595,8 +625,8 @@ const Members = () => {
                                                     key={plan}
                                                     onClick={() => setNewMember({ ...newMember, planType: plan })}
                                                     className={`flex-1 py-2.5 rounded-lg text-sm font-tech font-bold tracking-wider transition-all duration-200 ${newMember.planType === plan
-                                                        ? 'bg-gradient-to-r from-gold-400 to-gold-600 text-black shadow-[0_2px_10px_rgba(251,191,36,0.3)]'
-                                                        : 'text-gray-300 hover:text-white hover:bg-white/[0.06]'
+                                                        ? 'bg-gold-500/20 text-gold-400 border border-gold-400/50 shadow-[0_0_12px_rgba(251,191,36,0.2)]'
+                                                        : 'text-gray-400 hover:text-white hover:bg-white/[0.06] border border-transparent'
                                                         }`}
                                                 >
                                                     {plan}

@@ -3,13 +3,16 @@ CREATE TABLE members (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   phone TEXT NOT NULL,
-  photo TEXT, -- Base64 or URL
+  photo TEXT, -- Base64 or URL (compressed to ~20KB)
+  height REAL, -- Height in cm (used for BMI calculation)
   plan_type TEXT, -- Monthly, Quarterly, Yearly
   amount REAL,
   start_date DATE DEFAULT (DATE('now')),
-  expiry_date DATE, -- Changed from end_date to match API
+  expiry_date DATE, -- End date auto-calculated from plan type
   dob DATE, -- For Birthday feature
-  status TEXT DEFAULT 'active' -- active, expired, inactive
+  trainer_id INTEGER, -- Assigned trainer
+  status TEXT DEFAULT 'active', -- active, expired, inactive
+  FOREIGN KEY (trainer_id) REFERENCES trainers(id)
 );
 
 DROP TABLE IF EXISTS trainers;

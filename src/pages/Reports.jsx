@@ -46,7 +46,7 @@ const Reports = () => {
         return { text: 'No Change', icon: <Activity className="text-gray-500" size={20} />, color: 'text-gray-500' };
     };
 
-    const height = 175;
+    const height = reportData?.member?.height || selectedMember?.height || 0;
     const currentWeight = reportData?.stats?.currentWeight || 0;
     const initialWeight = reportData?.stats?.initialWeight || 0;
     const bmiData = calculateBMI(currentWeight, height);

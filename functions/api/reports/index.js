@@ -34,7 +34,17 @@ export async function onRequestGet(context) {
         const totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
         return Response.json({
-            member,
+            member: {
+                id: member.id,
+                name: member.name,
+                phone: member.phone,
+                dob: member.dob,
+                height: member.height,
+                planType: member.plan_type,
+                startDate: member.start_date,
+                expiry: member.expiry_date,
+                status: member.status
+            },
             stats: {
                 attendance: attendanceCount,
                 totalDays: totalDays || 1, // Avoid division by zero
