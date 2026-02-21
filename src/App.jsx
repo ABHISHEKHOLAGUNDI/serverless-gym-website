@@ -8,6 +8,7 @@ import Measurements from './pages/Measurements';
 import Reports from './pages/Reports';
 import Trainers from './pages/Trainers';
 import Maintenance from './pages/Maintenance';
+import AdminChat from './pages/AdminChat';
 import Layout from './components/Layout';
 import PortalLayout from './components/PortalLayout';
 import PortalDashboard from './pages/portal/PortalDashboard';
@@ -61,6 +62,7 @@ function App() {
                   <Route path="/measurements" element={<Measurements />} />
                   <Route path="/expenses" element={<Expenses />} />
                   <Route path="/reports" element={<Reports />} />
+                  <Route path="/admin-chat" element={<AdminChat />} />
                 </Route>
               </Route>
 

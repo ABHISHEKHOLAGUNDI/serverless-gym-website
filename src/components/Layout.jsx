@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Users, CalendarCheck, Settings, LogOut, FileText, DollarSign, Activity, Dumbbell, Shield, AlertTriangle } from 'lucide-react';
+import { Menu, X, Home, Users, CalendarCheck, Settings, LogOut, FileText, DollarSign, Activity, Dumbbell, Shield, AlertTriangle, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGymContext } from '../context/GymContext';
 
@@ -29,6 +29,7 @@ const Layout = () => {
         { icon: <DollarSign size={20} />, label: 'Manage Expenses', path: '/expenses' },
         { icon: <Activity size={20} />, label: 'Measurements', path: '/measurements' },
         { icon: <FileText size={20} />, label: 'Reports', path: '/reports' },
+        { icon: <MessageCircle size={20} />, label: 'Member Chats', path: '/admin-chat' },
         { icon: <LogOut size={20} />, label: 'Logout', path: '/login', action: true },
     ];
 

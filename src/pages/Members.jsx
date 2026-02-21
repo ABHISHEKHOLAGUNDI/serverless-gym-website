@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Phone, MoreVertical, Edit, Trash, Download, RefreshCw, X, MessageCircle, Cake, Users } from 'lucide-react';
+import { Search, Plus, Phone, MoreVertical, Edit, Trash, Download, RefreshCw, X, MessageCircle, Cake, Users, Dumbbell, UtensilsCrossed } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { useGymContext } from '../context/GymContext';
 import { useLocation } from 'react-router-dom';
+import WorkoutAssignModal from '../components/WorkoutAssignModal';
+import DietAssignModal from '../components/DietAssignModal';
 
 const Members = () => {
     const { members, trainers, addMember, updateMember, deleteMember, renewMember } = useGymContext();
@@ -13,6 +15,8 @@ const Members = () => {
     const [activeMenuId, setActiveMenuId] = useState(null);
     const [editMode, setEditMode] = useState(false); // false | 'edit' | 'renew'
     const [selectedMemberId, setSelectedMemberId] = useState(null);
+    const [workoutMember, setWorkoutMember] = useState(null);
+    const [dietMember, setDietMember] = useState(null);
 
     // Filter Logic
     const location = useLocation();
@@ -492,6 +496,8 @@ const Members = () => {
                                                     { label: 'Invoice', icon: <Download size={14} />, color: 'text-blue-400', bg: 'bg-blue-500/10', action: () => generateInvoice({ ...member, amount: '0.00' }) },
                                                     { label: 'Edit', icon: <Edit size={14} />, color: 'text-amber-400', bg: 'bg-amber-500/10', action: () => handleOpenModal('edit', member) },
                                                     { label: 'Renew', icon: <RefreshCw size={14} />, color: 'text-emerald-400', bg: 'bg-emerald-500/10', action: () => handleOpenModal('renew', member) },
+                                                    { label: 'Workout', icon: <Dumbbell size={14} />, color: 'text-purple-400', bg: 'bg-purple-500/10', action: () => { setWorkoutMember(member); setActiveMenuId(null); } },
+                                                    { label: 'Diet', icon: <UtensilsCrossed size={14} />, color: 'text-orange-400', bg: 'bg-orange-500/10', action: () => { setDietMember(member); setActiveMenuId(null); } },
                                                 ].map((item, i) => (
                                                     <button key={i} onClick={item.action} className="w-full text-left px-3 py-2.5 text-[13px] text-gray-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-2.5 font-tech tracking-wider transition-all">
                                                         <div className={`w-7 h-7 rounded-lg ${item.bg} ${item.color} flex items-center justify-center`}>{item.icon}</div>
@@ -782,6 +788,15 @@ const Members = () => {
                     </div>
                 </div>
             )}
+            {/* Workout Assign Modal */}
+            <AnimatePresence>
+                {workoutMember && <WorkoutAssignModal member={workoutMember} onClose={() => setWorkoutMember(null)} />}
+            </AnimatePresence>
+
+            {/* Diet Assign Modal */}
+            <AnimatePresence>
+                {dietMember && <DietAssignModal member={dietMember} onClose={() => setDietMember(null)} />}
+            </AnimatePresence>
         </motion.div>
     );
 };
